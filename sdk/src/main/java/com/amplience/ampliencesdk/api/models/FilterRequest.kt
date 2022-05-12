@@ -12,6 +12,6 @@ package com.amplience.ampliencesdk.api.models
 data class FilterRequest(
     val filterBy: List<FilterBy>,
     val sortBy: SortBy? = null,
-    val parameters: Parameters? = null,
-    val page: Page? = null
+    val page: Page? = null,
+    val parameters: Parameters = Parameters()
 )

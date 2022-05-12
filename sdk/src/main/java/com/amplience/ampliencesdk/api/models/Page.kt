@@ -12,5 +12,5 @@ package com.amplience.ampliencesdk.api.models
  */
 data class Page(
     val size: Int,
-    val cursor: Int? = null
+    val cursor: String? = null
 )

@@ -10,7 +10,7 @@ import com.amplience.sampleapp.model.Slide
 @Composable
 fun Slide(slide: Slide, modifier: Modifier = Modifier) {
     Box(modifier) {
-        Image(image = slide.imageItem, modifier = Modifier.fillMaxSize())
+        ImageUI(image = slide.imageItem.image, slide.imageItem.altText)
         Column {
             Headline(headline = slide.headline)
             Subheading(subheading = slide.subheading)

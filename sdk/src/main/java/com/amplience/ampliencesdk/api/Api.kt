@@ -16,7 +16,7 @@ internal interface Api {
     @GET("content/id/{id}?depth=all&format=inlined")
     suspend fun getContentById(@Path("id") id: String): Response<ContentResponse>
 
-    @GET("content/id/{key}?depth=all&format=inlined")
+    @GET("content/key/{key}?depth=all&format=inlined")
     suspend fun getContentByKey(@Path("key") key: String): Response<ContentResponse>
 
     @GET("content/fetch")

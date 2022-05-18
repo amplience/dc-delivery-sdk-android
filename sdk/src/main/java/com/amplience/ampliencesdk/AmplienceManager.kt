@@ -9,7 +9,11 @@ import com.amplience.ampliencesdk.api.models.images.ImageUrlBuilder
 import com.amplience.ampliencesdk.media.AmplienceImage
 import com.amplience.ampliencesdk.media.AmplienceVideo
 
-class AmplienceManager private constructor(context: Context, hub: String) {
+class AmplienceManager private constructor(
+    context: Context,
+    hub: String,
+    private val freshApiKey: String? = null
+) {
 
     companion object {
         private var sdkManager: AmplienceManager? = null
@@ -29,14 +33,35 @@ class AmplienceManager private constructor(context: Context, hub: String) {
          * Creates an instance of the [AmplienceManager] which
          * can be subsequently called with [getInstance]
          */
-        fun initialise(context: Context, hub: String) {
+        fun initialise(context: Context, hub: String, freshApiKey: String? = null) {
             sdkManager = AmplienceManager(context, hub)
         }
     }
 
-    private val api = RetrofitClient
+    private val cacheApi = RetrofitClient
         .getClient(context, "https://$hub.cdn.content.amplience.net/")
         .create(Api::class.java)
+
+    private val freshApi = RetrofitClient
+        .getClient(context, "https://$hub.fresh.content.amplience.net/", freshApiKey)
+        .create(Api::class.java)
+
+    private val api
+        get() = if (isFresh) freshApi else cacheApi
+
+    /**
+     * [isFresh] - switch between fresh or cached environments
+     * See https://amplience.com/docs/development/freshapi/fresh-api.html for details
+     *
+     * @throws RuntimeException if you have not provided a freshApiKey in the [AmplienceManager.initialise] method
+     */
+    var isFresh: Boolean = false
+        set(isFresh) {
+            field = isFresh
+            if (isFresh && freshApiKey == null) {
+                throw RuntimeException("Cannot switch to fresh environment without setting a fresh api key")
+            }
+        }
 
     /**
      * [getContentById]
@@ -117,6 +142,35 @@ class AmplienceManager private constructor(context: Context, hub: String) {
         Log.d("getFiltered", res.body().toString())
         return if (res.isSuccessful) {
             Result.success(res.body()?.responses)
+        } else {
+            Result.failure(Exception(res.errorBody()?.string()))
+        }
+    }
+
+    /**
+     * [getMultipleContent]
+     * @param requests - ids or keys of content to get
+     * @param locale (optional) - to override default locale
+     *
+     * @return [Result]List<[ContentResponse]>- returns either a success or failure.
+     * Can get successful result with result.getOrNull()
+     * Can get error response with result.getExceptionOrNull()
+     */
+    suspend fun getMultipleContent(
+        vararg requests: Request,
+        locale: String? = null
+    ): Result<List<ContentResponse>?> {
+        val res = try {
+            api.getMultipleContent(
+                ContentRequest(requests.toList(), parameters = Parameters(locale = locale))
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return Result.failure(e)
+        }
+
+        return if (res.isSuccessful) {
+            Result.success(res.body())
         } else {
             Result.failure(Exception(res.errorBody()?.string()))
         }

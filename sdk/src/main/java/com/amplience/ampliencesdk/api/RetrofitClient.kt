@@ -1,7 +1,6 @@
 package com.amplience.ampliencesdk.api
 
 import android.content.Context
-import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -13,7 +12,7 @@ internal object RetrofitClient {
 
     private var retrofit: Retrofit? = null
 
-    fun getClient(context: Context, baseUrl: String): Retrofit {
+    fun getClient(context: Context, baseUrl: String, freshApiKey: String? = null): Retrofit {
         if (retrofit == null) {
             val interceptor = HttpLoggingInterceptor()
             interceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS)
@@ -24,6 +23,13 @@ internal object RetrofitClient {
                 .readTimeout(30, TimeUnit.SECONDS)
 
             client.addInterceptor(interceptor)
+            if (freshApiKey != null) {
+                client.addInterceptor { chain ->
+                    val requestBuilder = chain.request().newBuilder()
+                    requestBuilder.header("X-API-Key", freshApiKey)
+                    chain.proceed(requestBuilder.build())
+                }
+            }
 
             val gson = GsonBuilder()
                 .setLenient()

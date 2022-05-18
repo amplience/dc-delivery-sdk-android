@@ -20,7 +20,7 @@ internal interface Api {
     suspend fun getContentByKey(@Path("key") key: String): Response<ContentResponse>
 
     @GET("content/fetch")
-    suspend fun getMultipleContent(@Body contentRequest: ContentRequest): Response<ContentResponse>
+    suspend fun getMultipleContent(@Body contentRequest: ContentRequest): Response<List<ContentResponse>>
 
     @POST("content/filter")
     suspend fun filterContent(@Body filterRequest: FilterRequest): Response<PagedResponse>

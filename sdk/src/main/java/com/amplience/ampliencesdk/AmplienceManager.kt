@@ -5,8 +5,9 @@ import android.util.Log
 import com.amplience.ampliencesdk.api.Api
 import com.amplience.ampliencesdk.api.RetrofitClient
 import com.amplience.ampliencesdk.api.models.*
-import com.amplience.ampliencesdk.api.models.images.*
-import com.amplience.ampliencesdk.media.Image
+import com.amplience.ampliencesdk.api.models.images.ImageUrlBuilder
+import com.amplience.ampliencesdk.media.AmplienceImage
+import com.amplience.ampliencesdk.media.AmplienceVideo
 
 class AmplienceManager private constructor(context: Context, hub: String) {
 
@@ -100,17 +101,12 @@ class AmplienceManager private constructor(context: Context, hub: String) {
         page: Page? = null,
         locale: String? = null
     ): Result<List<ContentResponse>?> {
-        return getContentByFilterRequest(
-            FilterRequest(
-                filterBy = filters.toList(),
-                sortBy = sortBy,
-                page = page,
-                parameters = Parameters(locale = locale)
-            )
+        val filterRequest = FilterRequest(
+            filterBy = filters.toList(),
+            sortBy = sortBy,
+            page = page,
+            parameters = Parameters(locale = locale)
         )
-    }
-
-    private suspend fun getContentByFilterRequest(filterRequest: FilterRequest): Result<List<ContentResponse>?> {
         val res = try {
             api.filterContent(filterRequest)
         } catch (e: Exception) {
@@ -129,21 +125,11 @@ class AmplienceManager private constructor(context: Context, hub: String) {
     /**
      * [getImageUrl] returns a url that can be used with any image loading libraries
      *
-     * @param width Sets the width of the image. If you only provide the width, the height will be calculated to maintain the aspect ratio.
-     * @param height Sets the height of the image. If you only provide the height, the width will be calculated to maintain the aspect ratio.
-     * @param quality Sets the compression quality of the image, this is a percentage 0-100. JPEGs are lossy, PNGs are lossless but are compressed with zlib.
-     * @param defaultQuality Specifies that the default quality should be used for the following
-    formats: webp,jp2,jpeg or png. Can be used with fmt=auto or on its own. See auto format
-    for more details. The default settings for each format are:
-    jp2 40
-    webp 80
-    jpeg 75
-    png 90
-     *
+     * @param image - your implementation of an [AmplienceImage]
+     * @param builder (optional) - manipulate the image. See [ImageUrlBuilder] for more info
      */
-
     fun getImageUrl(
-        image: Image,
+        image: AmplienceImage,
         builder: ImageUrlBuilder.() -> Unit = {}
     ): String {
         var string = "https://${image.defaultHost}/i/${image.endpoint}/${image.name}"
@@ -151,85 +137,31 @@ class AmplienceManager private constructor(context: Context, hub: String) {
         return string
     }
 
-    fun getImageUrl(
-        image: Image,
-        width: Int? = null,
-        height: Int? = null,
-        quality: Int? = null,
-        defaultQuality: Boolean? = null,
-        /*formatQuality: FormatQuality? = null,*/
-        scaleMode: ScaleMode? = null,
-        scaleFit: ScaleFit? = null,
-        resizeAlgorithm: ResizeAlgorithm? = null,
-        upscale: Upscale? = null,
-        maxWidth: Int? = null,
-        maxHeight: Int? = null
+    /**
+     * [getVideoUrl] returns a url that can be used with any video loading libraries
+     *
+     * @param video - your implementation of an [AmplienceVideo]
+     */
+    fun getVideoUrl(
+        video: AmplienceVideo
+    ): String = "https://${video.defaultHost}/v/${video.endpoint}/${video.name}/mp4_720p"
+
+    /**
+     * [getVideoThumbnailUrl] returns a url that can be used with any image loading libraries
+     *
+     * @param video - your implementation of an [AmplienceVideo]
+     * @param builder (optional) - manipulate the thumbnail image. See [ImageUrlBuilder] for more info
+     * @param thumbName (optional) - the specific thumb frame
+     *     e.g. https://cdn.media.amplience.net/v/ampproduct/ski-collection/thumbs/frame_0020.png
+     */
+    fun getVideoThumbnailUrl(
+        video: AmplienceVideo,
+        builder: ImageUrlBuilder.() -> Unit = {},
+        thumbName: String? = null
     ): String {
-        val builder = StringBuilder()
-        builder.append("https://${image.defaultHost}/i/${image.endpoint}/${image.name}")
-
-        var firstQuery = true
-
-        fun addQueryMarker() {
-            if (firstQuery) {
-                builder.append("?")
-                firstQuery = false
-            } else {
-                builder.append("&")
-            }
-        }
-
-        if (width != null) {
-            addQueryMarker()
-            builder.append("w=$width")
-        }
-
-        if (height != null) {
-            addQueryMarker()
-            builder.append("h=$height")
-        }
-
-        if (quality != null) {
-            addQueryMarker()
-            builder.append("qlt=$quality")
-        }
-
-        if (defaultQuality != null && defaultQuality) {
-            addQueryMarker()
-            builder.append("qlt=default")
-        }
-
-        if (scaleMode != null) {
-            addQueryMarker()
-            builder.append("sm=$scaleMode")
-        }
-
-        if (scaleFit != null) {
-            addQueryMarker()
-            builder.append("scalefit=$scaleFit")
-        }
-
-        if (resizeAlgorithm != null) {
-            addQueryMarker()
-            builder.append("filter=$resizeAlgorithm")
-        }
-
-        if (upscale != null) {
-            addQueryMarker()
-            builder.append("upscale=$upscale")
-        }
-
-        if (maxWidth != null) {
-            addQueryMarker()
-            builder.append("maxW=$maxWidth")
-        }
-
-        if (maxHeight != null) {
-            addQueryMarker()
-            builder.append("maxH=$maxHeight")
-        }
-
-        return builder.toString()
+        var string = "https://${video.defaultHost}/v/${video.endpoint}/${video.name}"
+        if (thumbName != null) string += "/thumbs/$thumbName"
+        string += ImageUrlBuilder().apply(builder).build()
+        return string
     }
-
 }

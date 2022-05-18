@@ -1,10 +1,10 @@
 package com.amplience.sampleapp.model
 
-import com.amplience.ampliencesdk.media.Image
+import com.amplience.ampliencesdk.media.AmplienceImage
 import com.google.gson.annotations.SerializedName
 
 data class Banner(
-    val background: Image,
+    val background: AmplienceImage,
     val headline: String,
     val strapline: String,
     @SerializedName("calltoactiontext")

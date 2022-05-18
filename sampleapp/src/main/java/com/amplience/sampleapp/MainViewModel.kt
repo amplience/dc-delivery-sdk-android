@@ -7,12 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.amplience.ampliencesdk.AmplienceManager
 import com.amplience.ampliencesdk.api.models.ContentResponse
-import com.amplience.ampliencesdk.api.models.images.ResizeAlgorithm
-import com.amplience.ampliencesdk.api.models.images.ScaleFit
-import com.amplience.ampliencesdk.api.models.images.ScaleMode
-import com.amplience.ampliencesdk.media.Image
+import com.amplience.ampliencesdk.media.AmplienceImage
 import com.amplience.ampliencesdk.parseToObject
-import com.amplience.ampliencesdk.parseToObjectList
 import com.amplience.sampleapp.model.Banner
 import com.amplience.sampleapp.model.Slide
 import kotlinx.coroutines.launch
@@ -46,7 +42,7 @@ class MainViewModel : ViewModel() {
                 this@MainViewModel.banner = banner
             }
         }
-        val image = Image("", "Hero-Banner-720-model2", "ampproduct", "cdn.media.amplience.net")
+        val image = AmplienceImage("", "Hero-Banner-720-model2", "ampproduct", "cdn.media.amplience.net")
         val test = AmplienceManager.getInstance().getImageUrl(image) {
             width(200)
             height(100)

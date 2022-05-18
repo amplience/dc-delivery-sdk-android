@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.amplience.ampliencesdk.media.Image
+import com.amplience.ampliencesdk.media.AmplienceImage
 import com.amplience.sampleapp.model.Banner
 
 @Composable
@@ -69,7 +69,7 @@ private fun CallToAction(
 @Composable
 fun BannerPreview() {
     val banner = Banner(
-        background = Image("", "", "", ""),
+        background = AmplienceImage("", "", "", ""),
         headline = "Get the look",
         strapline = "A chance to update your wardrobe",
         callToActionText = "Buy now",

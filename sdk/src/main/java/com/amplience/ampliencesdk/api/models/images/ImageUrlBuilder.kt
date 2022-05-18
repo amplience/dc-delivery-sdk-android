@@ -12,7 +12,6 @@ class ImageUrlBuilder {
     private var resizeAlgorithm: ResizeAlgorithm? = null
     private var upscale: Upscale? = null
     private var format: Format? = null
-    private var autoFormat: Boolean? = null
     private var formatQuality: FormatQuality? = null
     private var crop: Crop? = null
     private var edgeCrop: EdgeCrop? = null
@@ -40,6 +39,7 @@ class ImageUrlBuilder {
     private var hue: Int? = null
     private var saturation: Int? = null
     private var brightness: Int? = null
+    private var layers: ArrayList<Layer> = ArrayList()
 
     fun width(width: Int) = apply { this.width = width }
     fun height(height: Int) = apply { this.height = height }
@@ -175,6 +175,66 @@ class ImageUrlBuilder {
         this.brightness = brightness
     }
 
+    fun addImageLayer(
+        src: String,
+        width: Int? = null,
+        height: Int? = null,
+        topPx: Int? = null,
+        topPercent: Int? = null,
+        leftPx: Int? = null,
+        leftPercent: Int? = null,
+        bottomPx: Int? = null,
+        bottomPercent: Int? = null,
+        rightPx: Int? = null,
+        rightPercent: Int? = null,
+        anchor: Anchor? = null,
+        opacity: Int? = null
+    ) {
+        layers.add(
+            ImageLayer(
+                src,
+                width,
+                height,
+                topPx,
+                topPercent,
+                leftPx,
+                leftPercent,
+                bottomPx,
+                bottomPercent,
+                rightPx,
+                rightPercent,
+                anchor,
+                opacity
+            )
+        )
+    }
+
+    fun addTextLayer(
+        text: String,
+        fontSize: Int? = null, // defaults to 10
+        fontFamily: String? = null, // If you don't specify a font family, or specify a font that is not installed on your account, then it will default to Helevetica.
+        fontStyle: TextLayer.FontStyle? = null,
+        fontWeight: Int? = null, // Valid values are from 100 to 900 in multiples of 100.
+        fontStretch: TextLayer.FontStretch? = null,
+        textColor: TextLayer.TextColor? = null,
+        textDecoration: TextLayer.Decoration? = null,
+        textAlign: String? = null
+    ) {
+        layers.add(
+            TextLayer(
+                text,
+                fontSize,
+                fontFamily,
+                fontStyle,
+                fontWeight,
+                fontStretch,
+                textColor,
+                textDecoration,
+                textAlign
+            )
+        )
+    }
+
     fun build(): String {
         val builder = StringBuilder()
         var firstQuery = true
@@ -248,6 +308,10 @@ class ImageUrlBuilder {
         if (hue != null) addQuery("hue=$hue")
         if (saturation != null) addQuery("sat=$saturation")
         if (brightness != null) addQuery("bri=$brightness")
+
+        layers.forEachIndexed { index, layer ->
+            addQuery("layer${index + 1}=${layer.toQuery()}")
+        }
 
         return builder.toString()
     }

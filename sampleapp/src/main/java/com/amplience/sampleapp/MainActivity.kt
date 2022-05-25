@@ -4,17 +4,20 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.amplience.sampleapp.elements.Banner
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.amplience.sampleapp.elements.LoadingView
+import com.amplience.sampleapp.elements.ScreenUI
 import com.amplience.sampleapp.ui.theme.SampleAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -29,21 +32,36 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    /*LazyColumn {
-                        items(viewModel.slides) {
-                            Slide(slide = it, modifier = Modifier.aspectRatio(1.5f))
-                        }
-                    }*/
+                    Main(viewModel)
+                }
+            }
+        }
+    }
+}
 
-                    Column {
-                        viewModel.banner?.let {
-                            Banner(
-                                banner = it,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .aspectRatio(2.33f)
-                            )
-                        }
+@Composable
+fun Main(viewModel: MainViewModel) {
+    val navController = rememberNavController()
+    val title = viewModel.appBarTitle
+
+    if (viewModel.screens.isEmpty()) {
+        LoadingView()
+    } else {
+        Scaffold(
+            topBar = { TopBar(title, navController) }
+        ) { innerPadding ->
+            NavHost(
+                navController,
+                startDestination = "home",
+                Modifier.padding(innerPadding)
+            ) {
+                viewModel.screens.forEach { screen ->
+                    composable(screen.id) {
+                        ScreenUI(
+                            screen = screen,
+                            viewModel = viewModel,
+                            navController = navController
+                        )
                     }
                 }
             }
@@ -52,14 +70,29 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
+private fun TopBar(
+    title: String,
+    navController: NavHostController
+) {
+    TopAppBar(
+        title = { Text(text = title) },
+        navigationIcon = if (navController.currentDestination?.route != "home") {
+            {
+                IconButton(onClick = { navController.navigateUp() }) {
+                    Icon(
+                        Icons.Default.ArrowBack,
+                        contentDescription = "Back"
+                    )
+                }
+            }
+        } else null
+    )
 }
 
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     SampleAppTheme {
-        Greeting("Android")
+        Main(MainViewModel())
     }
 }

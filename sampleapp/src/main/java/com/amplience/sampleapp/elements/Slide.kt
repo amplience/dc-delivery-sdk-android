@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import com.amplience.sampleapp.model.Slide
 
 @Composable
-fun Slide(slide: Slide, modifier: Modifier = Modifier) {
+fun SlideUI(slide: Slide, modifier: Modifier = Modifier) {
     Box(modifier) {
         ImageUI(image = slide.imageItem.image, slide.imageItem.altText)
         Column {

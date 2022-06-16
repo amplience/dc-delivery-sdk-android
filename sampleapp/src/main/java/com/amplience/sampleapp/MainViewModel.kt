@@ -8,9 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.amplience.ampliencesdk.AmplienceManager
 import com.amplience.ampliencesdk.parseToObject
 import com.amplience.ampliencesdk.parseToObjectList
-import com.amplience.sampleapp.model.Banner
-import com.amplience.sampleapp.model.Screen
-import com.amplience.sampleapp.model.Slide
+import com.amplience.sampleapp.model.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -53,6 +51,29 @@ class MainViewModel : ViewModel() {
                 }
             } else {
                 Timber.e(bannerRes.exceptionOrNull())
+            }
+
+            val exampleContentRes =
+                AmplienceManager.getInstance().getContentByKey("example-content-items")
+            if (exampleContentRes.isSuccess) {
+                val map = exampleContentRes.getOrNull() ?: return@launch
+                Timber.d("Map $map")
+                val list = map.content.parseToObjectList<Map<String, Any>>("examples")
+                Timber.d("List? $list")
+                val banner = list?.get(0)?.parseToObject<Banner>()
+                val slides = list?.get(1)?.parseToObjectList<ImageSlide>("slides")
+                val text = list?.get(2)?.parseToObject<Text>()
+
+                Timber.d("Banner ${banner != null}, slides ${slides != null}, text $text")
+
+                if (banner != null && slides != null && text != null)
+                    exampleScreens.add(
+                        Screen.MultiContentExampleScreen(
+                            banner = banner,
+                            slides = slides,
+                            text = text.text
+                        )
+                    )
             }
 
             this@MainViewModel.screens = exampleScreens

@@ -20,4 +20,12 @@ sealed class Screen {
         override val name: String = "Slides",
         override val id: String = "slides"
     ) : Screen()
+
+    class MultiContentExampleScreen(
+        override val name: String = "Multi content example",
+        override val id: String = "multi-content",
+        val banner: Banner,
+        val slides: List<ImageSlide>,
+        val text: String
+    ) : Screen()
 }

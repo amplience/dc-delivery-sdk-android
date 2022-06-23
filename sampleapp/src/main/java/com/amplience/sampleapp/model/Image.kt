@@ -6,5 +6,6 @@ data class Image(
     override val id: String,
     override val name: String,
     override val defaultHost: String,
-    override val endpoint: String
+    override val endpoint: String,
+    val alt: String?
 ) : AmplienceImage()

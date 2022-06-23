@@ -7,8 +7,5 @@ data class Banner(
     val background: Image,
     val headline: String,
     val strapline: String,
-    @SerializedName("calltoactiontext")
-    val callToActionText: String,
-    @SerializedName("calltoactionurl")
-    val callToActionUrl: String
+    val link: Link
 )

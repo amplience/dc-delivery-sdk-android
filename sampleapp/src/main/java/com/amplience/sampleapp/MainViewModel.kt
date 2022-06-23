@@ -25,7 +25,7 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch {
             val exampleScreens = arrayListOf<Screen>(Screen.HomeScreen())
 
-            val bannerRes = AmplienceManager.getInstance().getContentByKey("example-key")
+            val bannerRes = AmplienceManager.getInstance().getContentByKey("new-banner-format")
             if (bannerRes.isSuccess) {
                 val map = bannerRes.getOrNull() ?: return@launch
                 Timber.d("Map $map")
@@ -59,12 +59,9 @@ class MainViewModel : ViewModel() {
                 val map = exampleContentRes.getOrNull() ?: return@launch
                 Timber.d("Map $map")
                 val list = map.content.parseToObjectList<Map<String, Any>>("examples")
-                Timber.d("List? $list")
                 val banner = list?.get(0)?.parseToObject<Banner>()
                 val slides = list?.get(1)?.parseToObjectList<ImageSlide>("slides")
                 val text = list?.get(2)?.parseToObject<Text>()
-
-                Timber.d("Banner ${banner != null}, slides ${slides != null}, text $text")
 
                 if (banner != null && slides != null && text != null)
                     exampleScreens.add(

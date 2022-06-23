@@ -14,31 +14,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.amplience.ampliencesdk.media.AmplienceImage
 import com.amplience.sampleapp.model.Banner
 import com.amplience.sampleapp.model.Image
+import com.amplience.sampleapp.model.Link
 
 @Composable
 fun Banner(banner: Banner, modifier: Modifier = Modifier) {
     val uriHandler = LocalUriHandler.current
 
     Box(modifier) {
-        ImageUI(image = banner.background, null, Modifier.fillMaxWidth())
+        ImageUI(image = banner.background, banner.background.alt, Modifier.fillMaxWidth())
 
         Box(
             Modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            Column() {
+            Column {
                 LightHeadline(headline = banner.headline)
                 LightSubheading(subheading = banner.strapline)
             }
 
             CallToAction(
-                banner.callToActionText,
+                banner.link.title,
                 onClick = {
-                    uriHandler.openUri(banner.callToActionUrl)
+                    uriHandler.openUri(banner.link.url)
                 },
                 Modifier.align(Alignment.BottomEnd)
             )
@@ -70,11 +70,10 @@ private fun CallToAction(
 @Composable
 fun BannerPreview() {
     val banner = Banner(
-        background = Image("", "", "", ""),
+        background = Image("", "", "", "", ""),
         headline = "Get the look",
         strapline = "A chance to update your wardrobe",
-        callToActionText = "Buy now",
-        callToActionUrl = "https://google.com"
+        link = Link("Buy now", "https://google.com")
     )
 
     Banner(banner = banner)

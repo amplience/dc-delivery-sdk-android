@@ -177,6 +177,70 @@ class AmplienceManager private constructor(
     }
 
     /**
+     * [getContentItemsById]
+     * @param ids - list of ids of content to get
+     * @param locale (optional) - to override default locale
+     *
+     * @return [Result]List<[ContentResponse]>- returns either a success or failure.
+     * Can get successful result with result.getOrNull()
+     * Can get error response with result.getExceptionOrNull()
+     */
+    suspend fun getContentItemsById(
+        vararg ids: String,
+        locale: String? = null
+    ): Result<List<ContentResponse>?> {
+        val res = try {
+            api.getMultipleContent(
+                ContentRequest(
+                    ids.map { id -> Request(id = id) },
+                    parameters = Parameters(locale = locale)
+                )
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return Result.failure(e)
+        }
+
+        return if (res.isSuccessful) {
+            Result.success(res.body())
+        } else {
+            Result.failure(Exception(res.errorBody()?.string()))
+        }
+    }
+
+    /**
+     * [getContentItemsByKey]
+     * @param keys - list of keys of content to get
+     * @param locale (optional) - to override default locale
+     *
+     * @return [Result]List<[ContentResponse]>- returns either a success or failure.
+     * Can get successful result with result.getOrNull()
+     * Can get error response with result.getExceptionOrNull()
+     */
+    suspend fun getContentItemsByKey(
+        vararg keys: String,
+        locale: String? = null
+    ): Result<List<ContentResponse>?> {
+        val res = try {
+            api.getMultipleContent(
+                ContentRequest(
+                    keys.map { key -> Request(key = key) },
+                    parameters = Parameters(locale = locale)
+                )
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return Result.failure(e)
+        }
+
+        return if (res.isSuccessful) {
+            Result.success(res.body())
+        } else {
+            Result.failure(Exception(res.errorBody()?.string()))
+        }
+    }
+
+    /**
      * [getImageUrl] returns a url that can be used with any image loading libraries
      *
      * @param image - your implementation of an [AmplienceImage]

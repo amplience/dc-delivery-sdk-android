@@ -6,6 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.amplience.ampliencesdk.AmplienceManager
+import com.amplience.ampliencesdk.api.models.FilterBy
+import com.amplience.ampliencesdk.api.models.SortBy
 import com.amplience.ampliencesdk.parseToObject
 import com.amplience.ampliencesdk.parseToObjectList
 import com.amplience.sampleapp.model.*
@@ -71,6 +73,83 @@ class MainViewModel : ViewModel() {
                             text = text.text
                         )
                     )
+            }
+
+            val filterableRes =
+                AmplienceManager.getInstance().getContentByFilters(
+                    FilterBy(
+                        "/_meta/schema",
+                        "https://example.com/blog-post-filter-and-sort"
+                    )
+                )
+            if (filterableRes.isSuccess) {
+                val results = filterableRes.getOrNull()
+                Timber.d("Filterable map $results")
+                val blogList = results?.mapNotNull { it.content.parseToObject<BlogPost>() }
+                Timber.d("Blog list $blogList")
+
+                if (blogList != null) {
+                    exampleScreens.add(
+                        Screen.BlogPostMenuScreen(
+                            posts = blogList.map {
+                                Screen.BlogPostScreen(it)
+                            }
+                        )
+                    )
+                }
+            }
+
+            val filterableByReadTimeRes =
+                AmplienceManager.getInstance().getContentByFilters(
+                    FilterBy(
+                        "/_meta/schema",
+                        "https://example.com/blog-post-filter-and-sort"
+                    ),
+                    sortBy = SortBy("readTime", SortBy.Order.DESC)
+                )
+            if (filterableByReadTimeRes.isSuccess) {
+                val results = filterableByReadTimeRes.getOrNull()
+                val blogList = results?.mapNotNull { it.content.parseToObject<BlogPost>() }
+
+                if (blogList != null) {
+                    exampleScreens.add(
+                        Screen.BlogPostMenuScreen(
+                            posts = blogList.map {
+                                Screen.BlogPostScreen(it)
+                            },
+                            name = "Blog menu sorted by read time",
+                            id = "blog-list-by-read-time"
+                        )
+                    )
+                }
+            }
+
+            val filterableByHomewareRes =
+                AmplienceManager.getInstance().getContentByFilters(
+                    FilterBy(
+                        "/_meta/schema",
+                        "https://example.com/blog-post-filter-and-sort"
+                    ),
+                    FilterBy(
+                        "/category",
+                        "Homewares"
+                    )
+                )
+            if (filterableByHomewareRes.isSuccess) {
+                val results = filterableByHomewareRes.getOrNull()
+                val blogList = results?.mapNotNull { it.content.parseToObject<BlogPost>() }
+
+                if (blogList != null) {
+                    exampleScreens.add(
+                        Screen.BlogPostMenuScreen(
+                            posts = blogList.map {
+                                Screen.BlogPostScreen(it)
+                            },
+                            name = "Blog menu (Homewares)",
+                            id = "blog-list-by-homewares"
+                        )
+                    )
+                }
             }
 
             this@MainViewModel.screens = exampleScreens

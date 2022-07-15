@@ -18,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.amplience.sampleapp.elements.LoadingView
 import com.amplience.sampleapp.elements.ScreenUI
+import com.amplience.sampleapp.model.Screen
 import com.amplience.sampleapp.ui.theme.SampleAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -62,6 +63,17 @@ fun Main(viewModel: MainViewModel) {
                             viewModel = viewModel,
                             navController = navController
                         )
+                    }
+                    if (screen is Screen.BlogPostMenuScreen) {
+                        screen.posts.forEach { blogScreen ->
+                            composable(blogScreen.id) {
+                                ScreenUI(
+                                    screen = blogScreen,
+                                    viewModel = viewModel,
+                                    navController = navController
+                                )
+                            }
+                        }
                     }
                 }
             }

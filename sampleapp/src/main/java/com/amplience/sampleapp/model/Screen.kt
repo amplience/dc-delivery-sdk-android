@@ -28,4 +28,16 @@ sealed class Screen {
         val slides: List<ImageSlide>,
         val text: String
     ) : Screen()
+
+    class BlogPostMenuScreen(
+        override val name: String = "Blog menu",
+        override val id: String = "blog-menu",
+        val posts: List<BlogPostScreen>
+    ) : Screen()
+
+    class BlogPostScreen(
+        val blogPost: BlogPost,
+        override val name: String = "Blog",
+        override val id: String = "blog-${blogPost.title}"
+    ) : Screen()
 }

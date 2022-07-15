@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -87,6 +88,23 @@ fun ScreenUI(
                     Text(text = screen.text, modifier = Modifier.padding(16.dp))
                 }
             }
+        }
+        is Screen.BlogPostMenuScreen -> {
+            LazyColumn {
+                items(screen.posts) { blogPostScreen ->
+                    Button(
+                        onClick = { navController.navigate(blogPostScreen.id) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        Text(text = blogPostScreen.blogPost.title)
+                    }
+                }
+            }
+        }
+        is Screen.BlogPostScreen -> {
+            BlogPostUI(blogPost = screen.blogPost)
         }
     }
 }

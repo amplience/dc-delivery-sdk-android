@@ -12,7 +12,7 @@ import com.amplience.ampliencesdk.media.AmplienceVideo
 class ContentClient private constructor(
     context: Context,
     hub: String,
-    private val freshApiKey: String? = null
+    private var freshApiKey: String? = null
 ) {
 
     companion object {
@@ -26,15 +26,30 @@ class ContentClient private constructor(
         fun getInstance(): ContentClient = sdkManager ?: throw NotInitialisedException()
 
         /**
+         * [newInstance]
+         * Get a new instance of a [ContentClient].
+         * This instance is NOT retained and accessible with [getInstance] - you must keep your own reference
+         *
+         * @param context
+         * @param hub - https://{hub}.cdn.content.amplience.net/
+         * @param freshApiKey
+         *
+         * @return [ContentClient]
+         */
+        fun newInstance(context: Context, hub: String, freshApiKey: String? = null): ContentClient =
+            ContentClient(context, hub, freshApiKey)
+
+        /**
          * [initialise]
          * @param context
          * @param hub - https://{hub}.cdn.content.amplience.net/
+         * @param freshApiKey
          *
          * Creates an instance of the [ContentClient] which
          * can be subsequently called with [getInstance]
          */
         fun initialise(context: Context, hub: String, freshApiKey: String? = null) {
-            sdkManager = ContentClient(context, hub)
+            sdkManager = ContentClient(context, hub, freshApiKey)
         }
     }
 

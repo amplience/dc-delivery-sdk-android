@@ -243,48 +243,4 @@ class AmplienceManager private constructor(
             Result.failure(Exception(res.errorBody()?.string()))
         }
     }
-
-    /**
-     * [getImageUrl] returns a url that can be used with any image loading libraries
-     *
-     * @param image - your implementation of an [AmplienceImage]
-     * @param builder (optional) - manipulate the image. See [ImageUrlBuilder] for more info
-     */
-    fun getImageUrl(
-        image: AmplienceImage,
-        builder: ImageUrlBuilder.() -> Unit = {}
-    ): String {
-        var string = "https://${image.defaultHost}/i/${image.endpoint}/${image.name}"
-        string += ImageUrlBuilder().apply(builder).build()
-        return string
-    }
-
-    /**
-     * [getVideoUrl] returns a url that can be used with any video loading libraries
-     *
-     * @param video - your implementation of an [AmplienceVideo]
-     */
-    fun getVideoUrl(
-        video: AmplienceVideo,
-        videoProfile: VideoProfile = VideoProfile.MP4_720P
-    ): String = "https://${video.defaultHost}/v/${video.endpoint}/${video.name}/$videoProfile"
-
-    /**
-     * [getVideoThumbnailUrl] returns a url that can be used with any image loading libraries
-     *
-     * @param video - your implementation of an [AmplienceVideo]
-     * @param builder (optional) - manipulate the thumbnail image. See [ImageUrlBuilder] for more info
-     * @param thumbName (optional) - the specific thumb frame
-     *     e.g. https://cdn.media.amplience.net/v/ampproduct/ski-collection/thumbs/frame_0020.png
-     */
-    fun getVideoThumbnailUrl(
-        video: AmplienceVideo,
-        builder: ImageUrlBuilder.() -> Unit = {},
-        thumbName: String? = null
-    ): String {
-        var string = "https://${video.defaultHost}/v/${video.endpoint}/${video.name}"
-        if (thumbName != null) string += "/thumbs/$thumbName"
-        string += ImageUrlBuilder().apply(builder).build()
-        return string
-    }
 }

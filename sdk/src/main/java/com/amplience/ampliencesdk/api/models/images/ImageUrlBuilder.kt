@@ -1,5 +1,7 @@
 package com.amplience.ampliencesdk.api.models.images
 
+import java.net.URLEncoder
+
 class ImageUrlBuilder {
     private var width: Int? = null
     private var height: Int? = null
@@ -313,6 +315,6 @@ class ImageUrlBuilder {
             addQuery("layer${index + 1}=${layer.toQuery()}")
         }
 
-        return builder.toString()
+        return URLEncoder.encode(builder.toString(), "UTF-8")
     }
 }

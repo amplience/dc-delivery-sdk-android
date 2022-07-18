@@ -123,14 +123,14 @@ class AmplienceManager private constructor(
     suspend fun getContentByFilters(
         vararg filters: FilterBy,
         sortBy: SortBy? = null,
-        page: Page? = null,
+        page: FilterRequest.Page? = null,
         locale: String? = null
     ): Result<List<ContentResponse>?> {
         val filterRequest = FilterRequest(
             filterBy = filters.toList(),
             sortBy = sortBy,
             page = page,
-            parameters = Parameters(locale = locale)
+            parameters = FilterRequest.Parameters(locale = locale)
         )
         val res = try {
             api.filterContent(filterRequest)
@@ -162,7 +162,10 @@ class AmplienceManager private constructor(
     ): Result<List<ContentResponse>?> {
         val res = try {
             api.getMultipleContent(
-                ContentRequest(requests.toList(), parameters = Parameters(locale = locale))
+                ContentRequest(
+                    requests.toList(),
+                    parameters = FilterRequest.Parameters(locale = locale)
+                )
             )
         } catch (e: Exception) {
             e.printStackTrace()
@@ -193,7 +196,7 @@ class AmplienceManager private constructor(
             api.getMultipleContent(
                 ContentRequest(
                     ids.map { id -> Request(id = id) },
-                    parameters = Parameters(locale = locale)
+                    parameters = FilterRequest.Parameters(locale = locale)
                 )
             )
         } catch (e: Exception) {
@@ -225,7 +228,7 @@ class AmplienceManager private constructor(
             api.getMultipleContent(
                 ContentRequest(
                     keys.map { key -> Request(key = key) },
-                    parameters = Parameters(locale = locale)
+                    parameters = FilterRequest.Parameters(locale = locale)
                 )
             )
         } catch (e: Exception) {

@@ -22,10 +22,7 @@ jobs:
       with:
         ruby-version: 2.6.x
     - name: Bundle install
-      run: |
-        bundle config path vendor/bundle
-        bundle install --jobs 4 --retry 3
-      timeout-minutes: 20
+      run: gem install bundler && bundle install
     - name: Run tests
       run: bundle exec fastlane test
       timeout-minutes: 20

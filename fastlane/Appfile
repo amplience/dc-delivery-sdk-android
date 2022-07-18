@@ -1,0 +1,2 @@
+# Google Service Account JSON secret keyfile is inserted as SUPPLY_JSON_KEY_DATA env-var: https://circleci.com/blog/deploy-flutter-android/
+package_name("com.amplience.sampleapp") # e.g. com.krausefx.app

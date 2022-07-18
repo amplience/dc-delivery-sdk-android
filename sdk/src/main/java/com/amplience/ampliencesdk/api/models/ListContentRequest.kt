@@ -1,6 +1,6 @@
 package com.amplience.ampliencesdk.api.models
 
-data class ContentRequest(
+data class ListContentRequest(
     val requests: List<Request>,
     val parameters: Parameters = Parameters()
 )

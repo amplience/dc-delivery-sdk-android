@@ -1,6 +1,6 @@
 package com.amplience.ampliencesdk.media
 
-import com.amplience.ampliencesdk.AmplienceManager
+import com.amplience.ampliencesdk.ContentClient
 import com.amplience.ampliencesdk.api.models.images.ImageUrlBuilder
 
 abstract class AmplienceImage {
@@ -10,5 +10,5 @@ abstract class AmplienceImage {
     abstract val defaultHost: String
 
     fun getUrl(builder: ImageUrlBuilder.() -> Unit = {}) =
-        AmplienceManager.getInstance().getImageUrl(this, builder)
+        ContentClient.getInstance().getImageUrl(this, builder)
 }

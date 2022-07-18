@@ -11,7 +11,7 @@ class ImageUrlBuilder {
     private var scaleFit: ScaleFit? = null
     private var resizeAlgorithm: ResizeAlgorithm? = null
     private var upscale: Upscale? = null
-    private var format: Format? = null
+    private var format: ContentFormat? = null
     private var formatQuality: FormatQuality? = null
     private var crop: Crop? = null
     private var edgeCrop: EdgeCrop? = null
@@ -64,17 +64,17 @@ class ImageUrlBuilder {
     fun upscale(upscale: Upscale) = apply { this.upscale = upscale }
 
     /**
-     * @param format - choose from 6 [Format]s
-     * @param quality - select a quality percentage 0-100 (does not apply to [Format.Gif] or [Format.Bmp])
+     * @param format - choose from 6 [ContentFormat]s
+     * @param quality - select a quality percentage 0-100 (does not apply to [ContentFormat.Gif] or [ContentFormat.Bmp])
      */
-    fun format(format: Format, quality: Int? = null) = apply {
+    fun format(format: ContentFormat, quality: Int? = null) = apply {
         this.format = format
         formatQuality = when (format) {
-            Format.Webp -> quality?.let { FormatQuality.Webp(it) }
-            Format.Jp2 -> quality?.let { FormatQuality.Jp2(it) }
-            Format.Jpeg -> quality?.let { FormatQuality.Jpeg(it) }
-            Format.Png -> quality?.let { FormatQuality.Png(it) }
-            Format.Gif, Format.Bmp -> null
+            ContentFormat.Webp -> quality?.let { FormatQuality.Webp(it) }
+            ContentFormat.Jp2 -> quality?.let { FormatQuality.Jp2(it) }
+            ContentFormat.Jpeg -> quality?.let { FormatQuality.Jpeg(it) }
+            ContentFormat.Png -> quality?.let { FormatQuality.Png(it) }
+            ContentFormat.Gif, ContentFormat.Bmp -> null
         }
     }
 

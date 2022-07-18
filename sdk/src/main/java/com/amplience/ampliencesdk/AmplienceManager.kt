@@ -8,6 +8,7 @@ import com.amplience.ampliencesdk.api.models.*
 import com.amplience.ampliencesdk.api.models.images.ImageUrlBuilder
 import com.amplience.ampliencesdk.media.AmplienceImage
 import com.amplience.ampliencesdk.media.AmplienceVideo
+import com.amplience.ampliencesdk.media.VideoProfile
 
 class AmplienceManager private constructor(
     context: Context,
@@ -264,8 +265,9 @@ class AmplienceManager private constructor(
      * @param video - your implementation of an [AmplienceVideo]
      */
     fun getVideoUrl(
-        video: AmplienceVideo
-    ): String = "https://${video.defaultHost}/v/${video.endpoint}/${video.name}/mp4_720p"
+        video: AmplienceVideo,
+        videoProfile: VideoProfile = VideoProfile.MP4_720P
+    ): String = "https://${video.defaultHost}/v/${video.endpoint}/${video.name}/$videoProfile"
 
     /**
      * [getVideoThumbnailUrl] returns a url that can be used with any image loading libraries

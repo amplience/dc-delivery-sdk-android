@@ -76,10 +76,10 @@ data class TextLayer(
     sealed class TextColor {
         data class Hex(val hex: String): TextColor()
         data class RGB(val red: Int, val green: Int, val blue: Int): TextColor()
-        data class ColourName(val name: String): TextColor()
+        data class ColorName(val name: String): TextColor()
 
         override fun toString(): String = when (this) {
-            is ColourName -> name
+            is ColorName -> name
             is Hex -> hex
             is RGB -> "rgb($red,$green,$blue)"
         }

@@ -28,7 +28,7 @@ class ImageUrlBuilder {
     private var dpiFilter: DpiFilter? = null
     private var strip: Boolean = false
     private var chromaSubsampling: Boolean = true
-    private var colourSpace: ColourSpace? = null
+    private var colorSpace: ColorSpace? = null
     private var unsharp: Unsharp? = null
     private var compositeMode: CompositeMode? = null
     private var backgroundRgb: Triple<Int, Int, Int>? = null
@@ -151,7 +151,7 @@ class ImageUrlBuilder {
     fun chromaSubsampling(chromaSubsampling: Boolean) =
         apply { this.chromaSubsampling = chromaSubsampling }
 
-    fun colourSpace(colourSpace: ColourSpace) = apply { this.colourSpace = colourSpace }
+    fun colorSpace(colorSpace: ColorSpace) = apply { this.colorSpace = colorSpace }
     fun unsharp(unsharp: Unsharp) = apply { this.unsharp = unsharp }
     fun compositeMode(compositeMode: CompositeMode) = apply { this.compositeMode = compositeMode }
     fun background(red: Int, green: Int, blue: Int) = apply {
@@ -290,7 +290,7 @@ class ImageUrlBuilder {
 
         if (strip) addQuery("strip=true")
         if (!chromaSubsampling) addQuery("fmt.jpeg.chroma=1,1,1")
-        if (colourSpace != null) addQuery("cs=$colourSpace")
+        if (colorSpace != null) addQuery("cs=$colorSpace")
         if (unsharp != null)
             addQuery("unsharp=${unsharp!!.radius},${unsharp!!.sigma},${unsharp!!.amount},${unsharp!!.threshold}")
 

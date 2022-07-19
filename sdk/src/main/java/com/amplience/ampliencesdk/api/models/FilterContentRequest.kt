@@ -37,7 +37,7 @@ data class FilterContentRequest(
      * @property locale
      */
     data class Parameters(
-        val depth: Depth = Depth.All,
+        val depth: ContentDepth = ContentDepth.All,
         val format: Format = Format.Inlined,
         val locale: String? = null
     )

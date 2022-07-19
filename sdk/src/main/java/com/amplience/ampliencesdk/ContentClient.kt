@@ -5,36 +5,33 @@ import android.util.Log
 import com.amplience.ampliencesdk.api.Api
 import com.amplience.ampliencesdk.api.RetrofitClient
 import com.amplience.ampliencesdk.api.models.*
-import com.amplience.ampliencesdk.api.models.images.ImageUrlBuilder
-import com.amplience.ampliencesdk.media.AmplienceImage
-import com.amplience.ampliencesdk.media.AmplienceVideo
 
-class AmplienceManager private constructor(
+class ContentClient private constructor(
     context: Context,
     hub: String,
     private val freshApiKey: String? = null
 ) {
 
     companion object {
-        private var sdkManager: AmplienceManager? = null
+        private var sdkManager: ContentClient? = null
 
         /**
          * [getInstance]
-         * Get the current instance of the [AmplienceManager].
+         * Get the current instance of the [ContentClient].
          * Throws a [NotInitialisedException] if called before [initialise]
          */
-        fun getInstance(): AmplienceManager = sdkManager ?: throw NotInitialisedException()
+        fun getInstance(): ContentClient = sdkManager ?: throw NotInitialisedException()
 
         /**
          * [initialise]
          * @param context
          * @param hub - https://{hub}.cdn.content.amplience.net/
          *
-         * Creates an instance of the [AmplienceManager] which
+         * Creates an instance of the [ContentClient] which
          * can be subsequently called with [getInstance]
          */
         fun initialise(context: Context, hub: String, freshApiKey: String? = null) {
-            sdkManager = AmplienceManager(context, hub)
+            sdkManager = ContentClient(context, hub)
         }
     }
 
@@ -53,7 +50,7 @@ class AmplienceManager private constructor(
      * [isFresh] - switch between fresh or cached environments
      * See https://amplience.com/docs/development/freshapi/fresh-api.html for details
      *
-     * @throws RuntimeException if you have not provided a freshApiKey in the [AmplienceManager.initialise] method
+     * @throws RuntimeException if you have not provided a freshApiKey in the [ContentClient.initialise] method
      */
     var isFresh: Boolean = false
         set(isFresh) {
@@ -67,11 +64,11 @@ class AmplienceManager private constructor(
      * [getContentById]
      * @param id - the id of the object you want to retrieve
      *
-     * @return [Result][ContentResponse] - returns either a success or failure.
+     * @return [Result][ListContentResponse] - returns either a success or failure.
      * Can get successful result with result.getOrNull()
      * Can get error response with result.getExceptionOrNull()
      */
-    suspend fun getContentById(id: String): Result<ContentResponse?> {
+    suspend fun getContentById(id: String): Result<ListContentResponse?> {
         val res = try {
             api.getContentById(id)
         } catch (e: Exception) {
@@ -90,11 +87,11 @@ class AmplienceManager private constructor(
      * [getContentByKey]
      * @param key - the key of the object you want to retrieve
      *
-     * @return [Result][ContentResponse] - returns either a success or failure.
+     * @return [Result][ListContentResponse] - returns either a success or failure.
      * Can get successful result with result.getOrNull()
      * Can get error response with result.getExceptionOrNull()
      */
-    suspend fun getContentByKey(key: String): Result<ContentResponse?> {
+    suspend fun getContentByKey(key: String): Result<ListContentResponse?> {
         val res = try {
             api.getContentByKey(key)
         } catch (e: Exception) {
@@ -110,7 +107,7 @@ class AmplienceManager private constructor(
     }
 
     /**
-     * [getContentByFilters]
+     * [filterContent]
      * @param filters - any number of [FilterBy] key value pairs
      * @param sortBy (optional) - a key [SortBy.key] and optional order
      * @param page (optional) - pagination
@@ -120,17 +117,17 @@ class AmplienceManager private constructor(
      * Can get successful result with result.getOrNull()
      * Can get error response with result.getExceptionOrNull()
      */
-    suspend fun getContentByFilters(
+    suspend fun filterContent(
         vararg filters: FilterBy,
         sortBy: SortBy? = null,
-        page: FilterRequest.Page? = null,
+        page: FilterContentRequest.Page? = null,
         locale: String? = null
-    ): Result<List<ContentResponse>?> {
-        val filterRequest = FilterRequest(
+    ): Result<FilterContentResponse?> {
+        val filterRequest = FilterContentRequest(
             filterBy = filters.toList(),
             sortBy = sortBy,
             page = page,
-            parameters = FilterRequest.Parameters(locale = locale)
+            parameters = FilterContentRequest.Parameters(locale = locale)
         )
         val res = try {
             api.filterContent(filterRequest)
@@ -141,14 +138,14 @@ class AmplienceManager private constructor(
 
         Log.d("getFiltered", res.body().toString())
         return if (res.isSuccessful) {
-            Result.success(res.body()?.responses)
+            Result.success(res.body())
         } else {
             Result.failure(Exception(res.errorBody()?.string()))
         }
     }
 
     /**
-     * [getMultipleContent]
+     * [listContent]
      * @param requests - ids or keys of content to get
      * @param locale (optional) - to override default locale
      *
@@ -156,15 +153,15 @@ class AmplienceManager private constructor(
      * Can get successful result with result.getOrNull()
      * Can get error response with result.getExceptionOrNull()
      */
-    suspend fun getMultipleContent(
+    suspend fun listContent(
         vararg requests: Request,
         locale: String? = null
-    ): Result<List<ContentResponse>?> {
+    ): Result<List<ListContentResponse>?> {
         val res = try {
             api.getMultipleContent(
-                ContentRequest(
+                ListContentRequest(
                     requests.toList(),
-                    parameters = FilterRequest.Parameters(locale = locale)
+                    parameters = FilterContentRequest.Parameters(locale = locale)
                 )
             )
         } catch (e: Exception) {
@@ -180,7 +177,7 @@ class AmplienceManager private constructor(
     }
 
     /**
-     * [getContentItemsById]
+     * [listContentById]
      * @param ids - list of ids of content to get
      * @param locale (optional) - to override default locale
      *
@@ -188,15 +185,15 @@ class AmplienceManager private constructor(
      * Can get successful result with result.getOrNull()
      * Can get error response with result.getExceptionOrNull()
      */
-    suspend fun getContentItemsById(
+    suspend fun listContentById(
         vararg ids: String,
         locale: String? = null
-    ): Result<List<ContentResponse>?> {
+    ): Result<List<ListContentResponse>?> {
         val res = try {
             api.getMultipleContent(
-                ContentRequest(
+                ListContentRequest(
                     ids.map { id -> Request(id = id) },
-                    parameters = FilterRequest.Parameters(locale = locale)
+                    parameters = FilterContentRequest.Parameters(locale = locale)
                 )
             )
         } catch (e: Exception) {
@@ -212,7 +209,7 @@ class AmplienceManager private constructor(
     }
 
     /**
-     * [getContentItemsByKey]
+     * [listContentByKey]
      * @param keys - list of keys of content to get
      * @param locale (optional) - to override default locale
      *
@@ -220,15 +217,15 @@ class AmplienceManager private constructor(
      * Can get successful result with result.getOrNull()
      * Can get error response with result.getExceptionOrNull()
      */
-    suspend fun getContentItemsByKey(
+    suspend fun listContentByKey(
         vararg keys: String,
         locale: String? = null
-    ): Result<List<ContentResponse>?> {
+    ): Result<List<ListContentResponse>?> {
         val res = try {
             api.getMultipleContent(
-                ContentRequest(
+                ListContentRequest(
                     keys.map { key -> Request(key = key) },
-                    parameters = FilterRequest.Parameters(locale = locale)
+                    parameters = FilterContentRequest.Parameters(locale = locale)
                 )
             )
         } catch (e: Exception) {
@@ -241,48 +238,5 @@ class AmplienceManager private constructor(
         } else {
             Result.failure(Exception(res.errorBody()?.string()))
         }
-    }
-
-    /**
-     * [getImageUrl] returns a url that can be used with any image loading libraries
-     *
-     * @param image - your implementation of an [AmplienceImage]
-     * @param builder (optional) - manipulate the image. See [ImageUrlBuilder] for more info
-     */
-    fun getImageUrl(
-        image: AmplienceImage,
-        builder: ImageUrlBuilder.() -> Unit = {}
-    ): String {
-        var string = "https://${image.defaultHost}/i/${image.endpoint}/${image.name}"
-        string += ImageUrlBuilder().apply(builder).build()
-        return string
-    }
-
-    /**
-     * [getVideoUrl] returns a url that can be used with any video loading libraries
-     *
-     * @param video - your implementation of an [AmplienceVideo]
-     */
-    fun getVideoUrl(
-        video: AmplienceVideo
-    ): String = "https://${video.defaultHost}/v/${video.endpoint}/${video.name}/mp4_720p"
-
-    /**
-     * [getVideoThumbnailUrl] returns a url that can be used with any image loading libraries
-     *
-     * @param video - your implementation of an [AmplienceVideo]
-     * @param builder (optional) - manipulate the thumbnail image. See [ImageUrlBuilder] for more info
-     * @param thumbName (optional) - the specific thumb frame
-     *     e.g. https://cdn.media.amplience.net/v/ampproduct/ski-collection/thumbs/frame_0020.png
-     */
-    fun getVideoThumbnailUrl(
-        video: AmplienceVideo,
-        builder: ImageUrlBuilder.() -> Unit = {},
-        thumbName: String? = null
-    ): String {
-        var string = "https://${video.defaultHost}/v/${video.endpoint}/${video.name}"
-        if (thumbName != null) string += "/thumbs/$thumbName"
-        string += ImageUrlBuilder().apply(builder).build()
-        return string
     }
 }

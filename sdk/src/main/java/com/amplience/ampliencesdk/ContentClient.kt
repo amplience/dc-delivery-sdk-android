@@ -9,47 +9,32 @@ import com.amplience.ampliencesdk.api.models.images.ImageUrlBuilder
 import com.amplience.ampliencesdk.media.AmplienceImage
 import com.amplience.ampliencesdk.media.AmplienceVideo
 
-class ContentClient private constructor(
+class AmplienceManager private constructor(
     context: Context,
     hub: String,
-    private var freshApiKey: String? = null
+    private val freshApiKey: String? = null
 ) {
 
     companion object {
-        private var sdkManager: ContentClient? = null
+        private var sdkManager: AmplienceManager? = null
 
         /**
          * [getInstance]
-         * Get the current instance of the [ContentClient].
+         * Get the current instance of the [AmplienceManager].
          * Throws a [NotInitialisedException] if called before [initialise]
          */
-        fun getInstance(): ContentClient = sdkManager ?: throw NotInitialisedException()
-
-        /**
-         * [newInstance]
-         * Get a new instance of a [ContentClient].
-         * This instance is NOT retained and accessible with [getInstance] - you must keep your own reference
-         *
-         * @param context
-         * @param hub - https://{hub}.cdn.content.amplience.net/
-         * @param freshApiKey
-         *
-         * @return [ContentClient]
-         */
-        fun newInstance(context: Context, hub: String, freshApiKey: String? = null): ContentClient =
-            ContentClient(context, hub, freshApiKey)
+        fun getInstance(): AmplienceManager = sdkManager ?: throw NotInitialisedException()
 
         /**
          * [initialise]
          * @param context
          * @param hub - https://{hub}.cdn.content.amplience.net/
-         * @param freshApiKey
          *
-         * Creates an instance of the [ContentClient] which
+         * Creates an instance of the [AmplienceManager] which
          * can be subsequently called with [getInstance]
          */
         fun initialise(context: Context, hub: String, freshApiKey: String? = null) {
-            sdkManager = ContentClient(context, hub, freshApiKey)
+            sdkManager = AmplienceManager(context, hub)
         }
     }
 
@@ -68,7 +53,7 @@ class ContentClient private constructor(
      * [isFresh] - switch between fresh or cached environments
      * See https://amplience.com/docs/development/freshapi/fresh-api.html for details
      *
-     * @throws RuntimeException if you have not provided a freshApiKey in the [ContentClient.initialise] method
+     * @throws RuntimeException if you have not provided a freshApiKey in the [AmplienceManager.initialise] method
      */
     var isFresh: Boolean = false
         set(isFresh) {
@@ -82,11 +67,11 @@ class ContentClient private constructor(
      * [getContentById]
      * @param id - the id of the object you want to retrieve
      *
-     * @return [Result][ListContentResponse] - returns either a success or failure.
+     * @return [Result][ContentResponse] - returns either a success or failure.
      * Can get successful result with result.getOrNull()
      * Can get error response with result.getExceptionOrNull()
      */
-    suspend fun getContentById(id: String): Result<ListContentResponse?> {
+    suspend fun getContentById(id: String): Result<ContentResponse?> {
         val res = try {
             api.getContentById(id)
         } catch (e: Exception) {
@@ -105,11 +90,11 @@ class ContentClient private constructor(
      * [getContentByKey]
      * @param key - the key of the object you want to retrieve
      *
-     * @return [Result][ListContentResponse] - returns either a success or failure.
+     * @return [Result][ContentResponse] - returns either a success or failure.
      * Can get successful result with result.getOrNull()
      * Can get error response with result.getExceptionOrNull()
      */
-    suspend fun getContentByKey(key: String): Result<ListContentResponse?> {
+    suspend fun getContentByKey(key: String): Result<ContentResponse?> {
         val res = try {
             api.getContentByKey(key)
         } catch (e: Exception) {
@@ -125,27 +110,27 @@ class ContentClient private constructor(
     }
 
     /**
-     * [filterContent]
+     * [getContentByFilters]
      * @param filters - any number of [FilterBy] key value pairs
      * @param sortBy (optional) - a key [SortBy.key] and optional order
      * @param page (optional) - pagination
      * @param locale (optional) - to override default locale
      *
-     * @return [Result][FilterContentResponse] - returns either a success or failure.
+     * @return [Result][ContentResponse] - returns either a success or failure.
      * Can get successful result with result.getOrNull()
      * Can get error response with result.getExceptionOrNull()
      */
-    suspend fun filterContent(
+    suspend fun getContentByFilters(
         vararg filters: FilterBy,
         sortBy: SortBy? = null,
-        page: Page? = null,
+        page: FilterRequest.Page? = null,
         locale: String? = null
-    ): Result<FilterContentResponse?> {
-        val filterRequest = FilterContentRequest(
+    ): Result<List<ContentResponse>?> {
+        val filterRequest = FilterRequest(
             filterBy = filters.toList(),
             sortBy = sortBy,
             page = page,
-            parameters = Parameters(locale = locale)
+            parameters = FilterRequest.Parameters(locale = locale)
         )
         val res = try {
             api.filterContent(filterRequest)
@@ -156,59 +141,30 @@ class ContentClient private constructor(
 
         Log.d("getFiltered", res.body().toString())
         return if (res.isSuccessful) {
-            Result.success(res.body())
+            Result.success(res.body()?.responses)
         } else {
             Result.failure(Exception(res.errorBody()?.string()))
         }
     }
 
     /**
-     * [listContent]
+     * [getMultipleContent]
      * @param requests - ids or keys of content to get
      * @param locale (optional) - to override default locale
      *
-     * @return [Result]List<[ListContentResponse]>- returns either a success or failure.
+     * @return [Result]List<[ContentResponse]>- returns either a success or failure.
      * Can get successful result with result.getOrNull()
      * Can get error response with result.getExceptionOrNull()
      */
-    suspend fun listContent(
+    suspend fun getMultipleContent(
         vararg requests: Request,
         locale: String? = null
-    ): Result<List<ListContentResponse>?> {
+    ): Result<List<ContentResponse>?> {
         val res = try {
             api.getMultipleContent(
-                ListContentRequest(requests.toList(), parameters = Parameters(locale = locale))
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return Result.failure(e)
-        }
-
-        return if (res.isSuccessful) {
-            Result.success(res.body())
-        } else {
-            Result.failure(Exception(res.errorBody()?.string()))
-        }
-    }
-
-    /**
-     * [listContentById]
-     * @param ids - list of ids of content to get
-     * @param locale (optional) - to override default locale
-     *
-     * @return [Result]List<[ListContentResponse]>- returns either a success or failure.
-     * Can get successful result with result.getOrNull()
-     * Can get error response with result.getExceptionOrNull()
-     */
-    suspend fun listContentById(
-        vararg ids: String,
-        locale: String? = null
-    ): Result<List<ListContentResponse>?> {
-        val res = try {
-            api.getMultipleContent(
-                ListContentRequest(
-                    ids.map { id -> Request(id = id) },
-                    parameters = Parameters(locale = locale)
+                ContentRequest(
+                    requests.toList(),
+                    parameters = FilterRequest.Parameters(locale = locale)
                 )
             )
         } catch (e: Exception) {
@@ -224,23 +180,55 @@ class ContentClient private constructor(
     }
 
     /**
-     * [listContentByKey]
-     * @param keys - list of keys of content to get
+     * [getContentItemsById]
+     * @param ids - list of ids of content to get
      * @param locale (optional) - to override default locale
      *
-     * @return [Result]List<[ListContentResponse]>- returns either a success or failure.
+     * @return [Result]List<[ContentResponse]>- returns either a success or failure.
      * Can get successful result with result.getOrNull()
      * Can get error response with result.getExceptionOrNull()
      */
-    suspend fun listContentByKey(
-        vararg keys: String,
+    suspend fun getContentItemsById(
+        vararg ids: String,
         locale: String? = null
-    ): Result<List<ListContentResponse>?> {
+    ): Result<List<ContentResponse>?> {
         val res = try {
             api.getMultipleContent(
-                ListContentRequest(
+                ContentRequest(
+                    ids.map { id -> Request(id = id) },
+                    parameters = FilterRequest.Parameters(locale = locale)
+                )
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return Result.failure(e)
+        }
+
+        return if (res.isSuccessful) {
+            Result.success(res.body())
+        } else {
+            Result.failure(Exception(res.errorBody()?.string()))
+        }
+    }
+
+    /**
+     * [getContentItemsByKey]
+     * @param keys - list of keys of content to get
+     * @param locale (optional) - to override default locale
+     *
+     * @return [Result]List<[ContentResponse]>- returns either a success or failure.
+     * Can get successful result with result.getOrNull()
+     * Can get error response with result.getExceptionOrNull()
+     */
+    suspend fun getContentItemsByKey(
+        vararg keys: String,
+        locale: String? = null
+    ): Result<List<ContentResponse>?> {
+        val res = try {
+            api.getMultipleContent(
+                ContentRequest(
                     keys.map { key -> Request(key = key) },
-                    parameters = Parameters(locale = locale)
+                    parameters = FilterRequest.Parameters(locale = locale)
                 )
             )
         } catch (e: Exception) {

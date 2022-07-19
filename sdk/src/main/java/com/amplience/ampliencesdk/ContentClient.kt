@@ -125,22 +125,22 @@ class ContentClient private constructor(
     }
 
     /**
-     * [getContentByFilters]
+     * [filterContent]
      * @param filters - any number of [FilterBy] key value pairs
      * @param sortBy (optional) - a key [SortBy.key] and optional order
      * @param page (optional) - pagination
      * @param locale (optional) - to override default locale
      *
-     * @return [Result][ListContentResponse] - returns either a success or failure.
+     * @return [Result][FilterContentResponse] - returns either a success or failure.
      * Can get successful result with result.getOrNull()
      * Can get error response with result.getExceptionOrNull()
      */
-    suspend fun getContentByFilters(
+    suspend fun filterContent(
         vararg filters: FilterBy,
         sortBy: SortBy? = null,
         page: Page? = null,
         locale: String? = null
-    ): Result<List<ListContentResponse>?> {
+    ): Result<FilterContentResponse?> {
         val filterRequest = FilterContentRequest(
             filterBy = filters.toList(),
             sortBy = sortBy,
@@ -156,14 +156,14 @@ class ContentClient private constructor(
 
         Log.d("getFiltered", res.body().toString())
         return if (res.isSuccessful) {
-            Result.success(res.body()?.responses)
+            Result.success(res.body())
         } else {
             Result.failure(Exception(res.errorBody()?.string()))
         }
     }
 
     /**
-     * [getMultipleContent]
+     * [listContent]
      * @param requests - ids or keys of content to get
      * @param locale (optional) - to override default locale
      *
@@ -171,7 +171,7 @@ class ContentClient private constructor(
      * Can get successful result with result.getOrNull()
      * Can get error response with result.getExceptionOrNull()
      */
-    suspend fun getMultipleContent(
+    suspend fun listContent(
         vararg requests: Request,
         locale: String? = null
     ): Result<List<ListContentResponse>?> {
@@ -192,7 +192,7 @@ class ContentClient private constructor(
     }
 
     /**
-     * [getContentItemsById]
+     * [listContentById]
      * @param ids - list of ids of content to get
      * @param locale (optional) - to override default locale
      *
@@ -200,7 +200,7 @@ class ContentClient private constructor(
      * Can get successful result with result.getOrNull()
      * Can get error response with result.getExceptionOrNull()
      */
-    suspend fun getContentItemsById(
+    suspend fun listContentById(
         vararg ids: String,
         locale: String? = null
     ): Result<List<ListContentResponse>?> {
@@ -224,7 +224,7 @@ class ContentClient private constructor(
     }
 
     /**
-     * [getContentItemsByKey]
+     * [listContentByKey]
      * @param keys - list of keys of content to get
      * @param locale (optional) - to override default locale
      *
@@ -232,7 +232,7 @@ class ContentClient private constructor(
      * Can get successful result with result.getOrNull()
      * Can get error response with result.getExceptionOrNull()
      */
-    suspend fun getContentItemsByKey(
+    suspend fun listContentByKey(
         vararg keys: String,
         locale: String? = null
     ): Result<List<ListContentResponse>?> {

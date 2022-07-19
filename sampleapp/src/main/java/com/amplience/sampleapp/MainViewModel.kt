@@ -76,7 +76,7 @@ class MainViewModel : ViewModel() {
             }
 
             val filterableRes =
-                ContentClient.getInstance().getContentByFilters(
+                ContentClient.getInstance().filterContent(
                     FilterBy(
                         "/_meta/schema",
                         "https://example.com/blog-post-filter-and-sort"
@@ -85,7 +85,7 @@ class MainViewModel : ViewModel() {
             if (filterableRes.isSuccess) {
                 val results = filterableRes.getOrNull()
                 Timber.d("Filterable map $results")
-                val blogList = results?.mapNotNull { it.content?.parseToObject<BlogPost>() }
+                val blogList = results?.responses?.mapNotNull { it.content?.parseToObject<BlogPost>() }
                 Timber.d("Blog list $blogList")
 
                 if (blogList != null) {
@@ -100,7 +100,7 @@ class MainViewModel : ViewModel() {
             }
 
             val filterableByReadTimeRes =
-                ContentClient.getInstance().getContentByFilters(
+                ContentClient.getInstance().filterContent(
                     FilterBy(
                         "/_meta/schema",
                         "https://example.com/blog-post-filter-and-sort"
@@ -109,7 +109,7 @@ class MainViewModel : ViewModel() {
                 )
             if (filterableByReadTimeRes.isSuccess) {
                 val results = filterableByReadTimeRes.getOrNull()
-                val blogList = results?.mapNotNull { it.content?.parseToObject<BlogPost>() }
+                val blogList = results?.responses?.mapNotNull { it.content?.parseToObject<BlogPost>() }
 
                 if (blogList != null) {
                     exampleScreens.add(
@@ -125,7 +125,7 @@ class MainViewModel : ViewModel() {
             }
 
             val filterableByHomewareRes =
-                ContentClient.getInstance().getContentByFilters(
+                ContentClient.getInstance().filterContent(
                     FilterBy(
                         "/_meta/schema",
                         "https://example.com/blog-post-filter-and-sort"
@@ -137,7 +137,7 @@ class MainViewModel : ViewModel() {
                 )
             if (filterableByHomewareRes.isSuccess) {
                 val results = filterableByHomewareRes.getOrNull()
-                val blogList = results?.mapNotNull { it.content?.parseToObject<BlogPost>() }
+                val blogList = results?.responses?.mapNotNull { it.content?.parseToObject<BlogPost>() }
 
                 if (blogList != null) {
                     exampleScreens.add(

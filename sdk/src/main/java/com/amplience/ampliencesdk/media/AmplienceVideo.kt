@@ -10,10 +10,10 @@ abstract class AmplienceVideo {
     /**
      * [getUrl] returns a url that can be used with any video loading libraries
      *
-     * @param videoProfile - the video quality as defined in [VideoProfile]
+     * @param videoProfile
      */
     fun getUrl(
-        videoProfile: VideoProfile = VideoProfile.MP4_720P
+        videoProfile: String = "mp4_720p"
     ): String = "https://${defaultHost}/v/${endpoint}/${name}/$videoProfile"
 
     /**

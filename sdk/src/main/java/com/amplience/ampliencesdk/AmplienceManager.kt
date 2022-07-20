@@ -5,10 +5,6 @@ import android.util.Log
 import com.amplience.ampliencesdk.api.Api
 import com.amplience.ampliencesdk.api.RetrofitClient
 import com.amplience.ampliencesdk.api.models.*
-import com.amplience.ampliencesdk.api.models.images.ImageUrlBuilder
-import com.amplience.ampliencesdk.media.AmplienceImage
-import com.amplience.ampliencesdk.media.AmplienceVideo
-import com.amplience.ampliencesdk.media.VideoProfile
 
 class AmplienceManager private constructor(
     context: Context,

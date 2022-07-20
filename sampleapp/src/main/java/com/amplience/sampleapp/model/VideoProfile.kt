@@ -1,4 +1,4 @@
-package com.amplience.ampliencesdk.media
+package com.amplience.sampleapp.model
 
 enum class VideoProfile {
     MP4_720P, MP4_480P;

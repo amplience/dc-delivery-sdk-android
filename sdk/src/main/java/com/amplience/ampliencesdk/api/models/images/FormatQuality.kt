@@ -1,15 +1,16 @@
 package com.amplience.ampliencesdk.api.models.images
 
-sealed class FormatQuality {
-    class Webp(val quality: Int): FormatQuality()
-    class Jp2(val quality: Int): FormatQuality()
-    class Jpeg(val quality: Int): FormatQuality()
-    class Png(val quality: Int): FormatQuality()
+sealed class FormatQuality(val quality: Int) {
+    class Webp(quality: Int): FormatQuality(quality)
+    class Jp2(quality: Int): FormatQuality(quality)
+    class Jpeg(quality: Int): FormatQuality(quality)
+    class Png(quality: Int): FormatQuality(quality)
 
-    override fun toString(): String = when (this) {
-        is Webp -> "fmt.webp.qlt=$quality"
-        is Jp2 -> "fmt.jp2.qlt=$quality"
-        is Png -> "fmt.png.qlt=$quality"
-        is Jpeg -> "fmt.jpeg.qlt=$quality"
-    }
+    val queryString: String
+        get() = when (this) {
+            is Jp2 -> "fmt.jp2.qlt"
+            is Jpeg -> "fmt.jpeg.qlt"
+            is Png -> "fmt.png.qlt"
+            is Webp -> "fmt.webp.qlt"
+        }
 }

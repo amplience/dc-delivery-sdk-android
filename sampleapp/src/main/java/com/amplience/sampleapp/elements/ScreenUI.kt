@@ -90,7 +90,7 @@ fun ScreenUI(
                 }
                 if (screen.video != null) item {
                     Timber.d("Screen.video ${screen.video}")
-                    VideoUI(video = screen.video)
+                    VideoUI(video = screen.video, modifier = Modifier.fillMaxWidth().aspectRatio(1.5f))
                 }
             }
         }

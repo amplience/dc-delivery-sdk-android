@@ -3,6 +3,7 @@ package com.amplience.ampliencesdk.media
 import com.amplience.ampliencesdk.api.models.images.ImageUrlBuilder
 
 abstract class AmplienceVideo {
+    abstract val id: String
     abstract val name: String
     abstract val defaultHost: String
     abstract val endpoint: String

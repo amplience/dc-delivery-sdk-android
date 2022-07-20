@@ -64,15 +64,17 @@ class MainViewModel : ViewModel() {
                 val banner = list?.get(0)?.parseToObject<Banner>()
                 val slides = list?.get(1)?.parseToObjectList<ImageSlide>("slides")
                 val text = list?.get(2)?.parseToObject<Text>()
+                val video = list?.get(3)?.parseToObject<Video>("video")
+                Timber.d("Parsed video $video")
 
-                if (banner != null && slides != null && text != null)
-                    exampleScreens.add(
-                        Screen.MultiContentExampleScreen(
-                            banner = banner,
-                            slides = slides,
-                            text = text.text
-                        )
+                exampleScreens.add(
+                    Screen.MultiContentExampleScreen(
+                        banner = banner,
+                        slides = slides,
+                        text = text?.text,
+                        video = video
                     )
+                )
             }
 
             val filterableRes =

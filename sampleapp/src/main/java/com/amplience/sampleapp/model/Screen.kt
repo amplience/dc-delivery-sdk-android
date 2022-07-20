@@ -24,9 +24,10 @@ sealed class Screen {
     class MultiContentExampleScreen(
         override val name: String = "Multi content example",
         override val id: String = "multi-content",
-        val banner: Banner,
-        val slides: List<ImageSlide>,
-        val text: String
+        val banner: Banner?,
+        val slides: List<ImageSlide>?,
+        val text: String?,
+        val video: Video?
     ) : Screen()
 
     class BlogPostMenuScreen(

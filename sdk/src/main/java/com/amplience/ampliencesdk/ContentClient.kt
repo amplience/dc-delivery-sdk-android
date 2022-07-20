@@ -9,8 +9,12 @@ import com.amplience.ampliencesdk.api.models.*
 class ContentClient private constructor(
     context: Context,
     hub: String,
-    private val freshApiKey: String? = null
+    private val configuration: Configuration = Configuration()
 ) {
+
+    data class Configuration(
+        val freshApiKey: String? = null
+    )
 
     companion object {
         private var sdkManager: ContentClient? = null
@@ -23,15 +27,30 @@ class ContentClient private constructor(
         fun getInstance(): ContentClient = sdkManager ?: throw NotInitialisedException()
 
         /**
+         * [newInstance]
+         * Get a new instance of a [ContentClient].
+         * This instance is NOT retained and accessible with [getInstance] - you must keep your own reference
+         *
+         * @param context
+         * @param hub - https://{hub}.cdn.content.amplience.net/
+         * @param configuration (optional)
+         *
+         * @return [ContentClient]
+         */
+        fun newInstance(context: Context, hub: String, configuration: Configuration = Configuration()): ContentClient =
+            ContentClient(context, hub, configuration)
+
+        /**
          * [initialise]
          * @param context
          * @param hub - https://{hub}.cdn.content.amplience.net/
+         * @param configuration (optional)
          *
          * Creates an instance of the [ContentClient] which
          * can be subsequently called with [getInstance]
          */
-        fun initialise(context: Context, hub: String, freshApiKey: String? = null) {
-            sdkManager = ContentClient(context, hub)
+        fun initialise(context: Context, hub: String, configuration: Configuration = Configuration()) {
+            sdkManager = ContentClient(context, hub, configuration)
         }
     }
 
@@ -40,7 +59,7 @@ class ContentClient private constructor(
         .create(Api::class.java)
 
     private val freshApi = RetrofitClient
-        .getClient(context, "https://$hub.fresh.content.amplience.net/", freshApiKey)
+        .getClient(context, "https://$hub.fresh.content.amplience.net/", configuration.freshApiKey)
         .create(Api::class.java)
 
     private val api
@@ -55,7 +74,7 @@ class ContentClient private constructor(
     var isFresh: Boolean = false
         set(isFresh) {
             field = isFresh
-            if (isFresh && freshApiKey == null) {
+            if (isFresh && configuration.freshApiKey == null) {
                 throw RuntimeException("Cannot switch to fresh environment without setting a fresh api key")
             }
         }

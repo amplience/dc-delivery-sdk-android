@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.rememberAsyncImagePainter
-import com.amplience.ampliencesdk.AmplienceManager
 import com.amplience.ampliencesdk.media.AmplienceImage
 import timber.log.Timber
 

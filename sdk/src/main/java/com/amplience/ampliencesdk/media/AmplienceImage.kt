@@ -1,6 +1,5 @@
 package com.amplience.ampliencesdk.media
 
-import com.amplience.ampliencesdk.AmplienceManager
 import com.amplience.ampliencesdk.api.models.images.ImageUrlBuilder
 
 abstract class AmplienceImage {

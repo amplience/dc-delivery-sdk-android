@@ -6,32 +6,51 @@ import com.amplience.ampliencesdk.api.Api
 import com.amplience.ampliencesdk.api.RetrofitClient
 import com.amplience.ampliencesdk.api.models.*
 
-class AmplienceManager private constructor(
+class ContentClient private constructor(
     context: Context,
     hub: String,
-    private val freshApiKey: String? = null
+    private val configuration: Configuration = Configuration()
 ) {
 
+    data class Configuration(
+        val freshApiKey: String? = null
+    )
+
     companion object {
-        private var sdkManager: AmplienceManager? = null
+        private var sdkManager: ContentClient? = null
 
         /**
          * [getInstance]
-         * Get the current instance of the [AmplienceManager].
+         * Get the current instance of the [ContentClient].
          * Throws a [NotInitialisedException] if called before [initialise]
          */
-        fun getInstance(): AmplienceManager = sdkManager ?: throw NotInitialisedException()
+        fun getInstance(): ContentClient = sdkManager ?: throw NotInitialisedException()
+
+        /**
+         * [newInstance]
+         * Get a new instance of a [ContentClient].
+         * This instance is NOT retained and accessible with [getInstance] - you must keep your own reference
+         *
+         * @param context
+         * @param hub - https://{hub}.cdn.content.amplience.net/
+         * @param configuration (optional)
+         *
+         * @return [ContentClient]
+         */
+        fun newInstance(context: Context, hub: String, configuration: Configuration = Configuration()): ContentClient =
+            ContentClient(context, hub, configuration)
 
         /**
          * [initialise]
          * @param context
          * @param hub - https://{hub}.cdn.content.amplience.net/
+         * @param configuration (optional)
          *
-         * Creates an instance of the [AmplienceManager] which
+         * Creates an instance of the [ContentClient] which
          * can be subsequently called with [getInstance]
          */
-        fun initialise(context: Context, hub: String, freshApiKey: String? = null) {
-            sdkManager = AmplienceManager(context, hub)
+        fun initialise(context: Context, hub: String, configuration: Configuration = Configuration()) {
+            sdkManager = ContentClient(context, hub, configuration)
         }
     }
 
@@ -40,7 +59,7 @@ class AmplienceManager private constructor(
         .create(Api::class.java)
 
     private val freshApi = RetrofitClient
-        .getClient(context, "https://$hub.fresh.content.amplience.net/", freshApiKey)
+        .getClient(context, "https://$hub.fresh.content.amplience.net/", configuration.freshApiKey)
         .create(Api::class.java)
 
     private val api
@@ -50,12 +69,12 @@ class AmplienceManager private constructor(
      * [isFresh] - switch between fresh or cached environments
      * See https://amplience.com/docs/development/freshapi/fresh-api.html for details
      *
-     * @throws RuntimeException if you have not provided a freshApiKey in the [AmplienceManager.initialise] method
+     * @throws RuntimeException if you have not provided a freshApiKey in the [ContentClient.initialise] method
      */
     var isFresh: Boolean = false
         set(isFresh) {
             field = isFresh
-            if (isFresh && freshApiKey == null) {
+            if (isFresh && configuration.freshApiKey == null) {
                 throw RuntimeException("Cannot switch to fresh environment without setting a fresh api key")
             }
         }
@@ -64,11 +83,11 @@ class AmplienceManager private constructor(
      * [getContentById]
      * @param id - the id of the object you want to retrieve
      *
-     * @return [Result][ContentResponse] - returns either a success or failure.
+     * @return [Result][ListContentResponse] - returns either a success or failure.
      * Can get successful result with result.getOrNull()
      * Can get error response with result.getExceptionOrNull()
      */
-    suspend fun getContentById(id: String): Result<ContentResponse?> {
+    suspend fun getContentById(id: String): Result<ListContentResponse?> {
         val res = try {
             api.getContentById(id)
         } catch (e: Exception) {
@@ -87,11 +106,11 @@ class AmplienceManager private constructor(
      * [getContentByKey]
      * @param key - the key of the object you want to retrieve
      *
-     * @return [Result][ContentResponse] - returns either a success or failure.
+     * @return [Result][ListContentResponse] - returns either a success or failure.
      * Can get successful result with result.getOrNull()
      * Can get error response with result.getExceptionOrNull()
      */
-    suspend fun getContentByKey(key: String): Result<ContentResponse?> {
+    suspend fun getContentByKey(key: String): Result<ListContentResponse?> {
         val res = try {
             api.getContentByKey(key)
         } catch (e: Exception) {
@@ -107,7 +126,7 @@ class AmplienceManager private constructor(
     }
 
     /**
-     * [getContentByFilters]
+     * [filterContent]
      * @param filters - any number of [FilterBy] key value pairs
      * @param sortBy (optional) - a key [SortBy.key] and optional order
      * @param page (optional) - pagination
@@ -117,17 +136,17 @@ class AmplienceManager private constructor(
      * Can get successful result with result.getOrNull()
      * Can get error response with result.getExceptionOrNull()
      */
-    suspend fun getContentByFilters(
+    suspend fun filterContent(
         vararg filters: FilterBy,
         sortBy: SortBy? = null,
-        page: FilterRequest.Page? = null,
+        page: FilterContentRequest.Page? = null,
         locale: String? = null
-    ): Result<List<ContentResponse>?> {
-        val filterRequest = FilterRequest(
+    ): Result<FilterContentResponse?> {
+        val filterRequest = FilterContentRequest(
             filterBy = filters.toList(),
             sortBy = sortBy,
             page = page,
-            parameters = FilterRequest.Parameters(locale = locale)
+            parameters = FilterContentRequest.Parameters(locale = locale)
         )
         val res = try {
             api.filterContent(filterRequest)
@@ -138,14 +157,14 @@ class AmplienceManager private constructor(
 
         Log.d("getFiltered", res.body().toString())
         return if (res.isSuccessful) {
-            Result.success(res.body()?.responses)
+            Result.success(res.body())
         } else {
             Result.failure(Exception(res.errorBody()?.string()))
         }
     }
 
     /**
-     * [getMultipleContent]
+     * [listContent]
      * @param requests - ids or keys of content to get
      * @param locale (optional) - to override default locale
      *
@@ -153,15 +172,15 @@ class AmplienceManager private constructor(
      * Can get successful result with result.getOrNull()
      * Can get error response with result.getExceptionOrNull()
      */
-    suspend fun getMultipleContent(
+    suspend fun listContent(
         vararg requests: Request,
         locale: String? = null
-    ): Result<List<ContentResponse>?> {
+    ): Result<List<ListContentResponse>?> {
         val res = try {
             api.getMultipleContent(
-                ContentRequest(
+                ListContentRequest(
                     requests.toList(),
-                    parameters = FilterRequest.Parameters(locale = locale)
+                    parameters = FilterContentRequest.Parameters(locale = locale)
                 )
             )
         } catch (e: Exception) {
@@ -177,7 +196,7 @@ class AmplienceManager private constructor(
     }
 
     /**
-     * [getContentItemsById]
+     * [listContentById]
      * @param ids - list of ids of content to get
      * @param locale (optional) - to override default locale
      *
@@ -185,15 +204,15 @@ class AmplienceManager private constructor(
      * Can get successful result with result.getOrNull()
      * Can get error response with result.getExceptionOrNull()
      */
-    suspend fun getContentItemsById(
+    suspend fun listContentById(
         vararg ids: String,
         locale: String? = null
-    ): Result<List<ContentResponse>?> {
+    ): Result<List<ListContentResponse>?> {
         val res = try {
             api.getMultipleContent(
-                ContentRequest(
+                ListContentRequest(
                     ids.map { id -> Request(id = id) },
-                    parameters = FilterRequest.Parameters(locale = locale)
+                    parameters = FilterContentRequest.Parameters(locale = locale)
                 )
             )
         } catch (e: Exception) {
@@ -209,7 +228,7 @@ class AmplienceManager private constructor(
     }
 
     /**
-     * [getContentItemsByKey]
+     * [listContentByKey]
      * @param keys - list of keys of content to get
      * @param locale (optional) - to override default locale
      *
@@ -217,15 +236,15 @@ class AmplienceManager private constructor(
      * Can get successful result with result.getOrNull()
      * Can get error response with result.getExceptionOrNull()
      */
-    suspend fun getContentItemsByKey(
+    suspend fun listContentByKey(
         vararg keys: String,
         locale: String? = null
-    ): Result<List<ContentResponse>?> {
+    ): Result<List<ListContentResponse>?> {
         val res = try {
             api.getMultipleContent(
-                ContentRequest(
+                ListContentRequest(
                     keys.map { key -> Request(key = key) },
-                    parameters = FilterRequest.Parameters(locale = locale)
+                    parameters = FilterContentRequest.Parameters(locale = locale)
                 )
             )
         } catch (e: Exception) {

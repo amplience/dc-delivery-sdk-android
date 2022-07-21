@@ -316,6 +316,6 @@ class ImageUrlBuilder {
             addQuery("layer${index + 1}", layer.toQuery())
         }
 
-        return URLEncoder.encode(builder.toString(), "UTF-8")
+        return builder.toString()
     }
 }

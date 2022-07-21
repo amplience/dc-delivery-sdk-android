@@ -241,7 +241,7 @@ class ImageUrlBuilder {
         val builder = StringBuilder()
         var firstQuery = true
 
-        fun addQuery(queryName: String, query: String) {
+        fun addQuery(queryName: String, vararg queries: Any, preEncoded: Boolean = false) {
             if (firstQuery) {
                 builder.append("?")
                 firstQuery = false
@@ -249,71 +249,131 @@ class ImageUrlBuilder {
                 builder.append("&")
             }
             builder.append("$queryName=")
-            builder.append(URLEncoder.encode(query, "UTF-8"))
+            queries.forEach { query ->
+                builder.append(
+                    if (preEncoded) {
+                        query.toString()
+                    } else {
+                        URLEncoder.encode(
+                            query.toString(),
+                            "UTF-8"
+                        )
+                    }
+                )
+                if (query != queries.last()) {
+                    builder.append(",")
+                }
+            }
         }
 
-        if (width != null) addQuery("w", "$width")
-        if (height != null) addQuery("h", "$height")
-        if (maxWidth != null) addQuery("maxW", "$maxWidth")
-        if (maxHeight != null) addQuery("maxH", "$maxHeight")
-        if (scaleMode != null) addQuery("sm", "$scaleMode")
-        if (scaleFit != null) addQuery("scalefit", "$scaleFit")
-        if (resizeAlgorithm != null) addQuery("filter", "$resizeAlgorithm")
-        if (upscale != null) addQuery("upscale", "$upscale")
-        if (crop != null) addQuery("crop", "${crop!!.x},${crop!!.y},${crop!!.w},${crop!!.h}")
+        if (width != null) addQuery("w", width!!)
+        if (height != null) addQuery("h", height!!)
+        if (maxWidth != null) addQuery("maxW", maxWidth!!)
+        if (maxHeight != null) addQuery("maxH", maxHeight!!)
+        if (scaleMode != null) {
+            addQuery("sm", scaleMode!!)
+            if (scaleMode is ScaleMode.AspectRatio) {
+                val ratio = (scaleMode as ScaleMode.AspectRatio).ratio
+                val ratioParts = ratio.split(":")
+                val encodedRatio = ratioParts.joinToString(separator = ":") {
+                    URLEncoder.encode(it, "UTF-8")
+                }
+                addQuery("aspect=", encodedRatio, preEncoded = true)
+            }
+        }
+        if (scaleFit != null) addQuery("scalefit", scaleFit!!)
+        if (resizeAlgorithm != null) addQuery("filter", resizeAlgorithm!!)
+        if (upscale != null) addQuery("upscale", upscale!!)
+        if (crop != null) addQuery(
+            "crop",
+            crop!!.x,
+            crop!!.y,
+            crop!!.w,
+            crop!!.h
+        )
         if (edgeCrop != null)
-            addQuery("ecrop", "${edgeCrop!!.left},${edgeCrop!!.top},${edgeCrop!!.right},${edgeCrop!!.bottom}")
+            addQuery(
+                "ecrop",
+                edgeCrop!!.left,
+                edgeCrop!!.top,
+                edgeCrop!!.right,
+                edgeCrop!!.bottom
+            )
 
         if (preCrop != null)
-            addQuery("pcrop", "${preCrop!!.x},${preCrop!!.y},${preCrop!!.w},${preCrop!!.h}")
+            addQuery(
+                "pcrop",
+                preCrop!!.x,
+                preCrop!!.y,
+                preCrop!!.w,
+                preCrop!!.h
+            )
 
         if (preEdgeCrop != null)
-            addQuery("pecrop", "${preEdgeCrop!!.left},${preEdgeCrop!!.top},${preEdgeCrop!!.right},${preEdgeCrop!!.bottom}")
+            addQuery(
+                "pecrop",
+                preEdgeCrop!!.left,
+                preEdgeCrop!!.top,
+                preEdgeCrop!!.right,
+                preEdgeCrop!!.bottom
+            )
 
         if (rotateDegrees != null) {
             if (preRotate == true) {
-                addQuery("protate", "$rotateDegrees")
+                addQuery("protate", rotateDegrees!!)
             } else {
-                addQuery("rotate", "$rotateDegrees")
+                addQuery("rotate", rotateDegrees!!)
             }
             if (rgb != null) builder.append(",rgb(${rgb!!.first},${rgb!!.second},${rgb!!.third})")
         }
 
-        if (flipH) addQuery("fliph", "true")
-        if (flipV) addQuery("flipv"," true")
-        if (format != null) addQuery("fmt", "$format")
-        if (formatQuality != null) addQuery(formatQuality!!.queryString, "${formatQuality!!.quality}")
+        if (flipH) addQuery("fliph", true)
+        if (flipV) addQuery("flipv", true)
+        if (format != null) addQuery("fmt", format!!)
+        if (formatQuality != null) addQuery(
+            formatQuality!!.queryString,
+            formatQuality!!.quality
+        )
 
         if (dpi != null) {
-            addQuery("dpi", "$dpi")
-            if (dpiFilter != null) addQuery("dpiFilter", "$dpiFilter")
+            addQuery("dpi", dpi!!)
+            if (dpiFilter != null) addQuery("dpiFilter", dpiFilter!!)
         }
 
-        if (strip) addQuery("strip", "true")
-        if (!chromaSubsampling) addQuery("fmt.jpeg.chroma", "1,1,1")
-        if (colorSpace != null) addQuery("cs", "$colorSpace")
+        if (strip) addQuery("strip", true)
+        if (!chromaSubsampling) addQuery("fmt.jpeg.chroma", 1, 1, 1)
+        if (colorSpace != null) addQuery("cs", colorSpace!!)
         if (unsharp != null)
-            addQuery("unsharp", "${unsharp!!.radius},${unsharp!!.sigma},${unsharp!!.amount},${unsharp!!.threshold}")
+            addQuery(
+                "unsharp",
+                unsharp!!.radius,
+                unsharp!!.sigma,
+                unsharp!!.amount,
+                unsharp!!.threshold
+            )
 
-        if (compositeMode != null) addQuery("cm", "$compositeMode")
+        if (compositeMode != null) addQuery("cm", compositeMode!!)
         if (backgroundRgb != null)
-            addQuery("bg", "rgb(${backgroundRgb!!.first},${backgroundRgb!!.second},${backgroundRgb!!.third})")
+            addQuery(
+                "bg",
+                "rgb(${backgroundRgb!!.first},${backgroundRgb!!.second},${backgroundRgb!!.third})"
+            )
 
         if (indexed) {
-            addQuery("fmt.png.indexed", "true")
-            if (paletteSize != null) addQuery("fmt.png.palettesize", "$paletteSize")
+            addQuery("fmt.png.indexed", true)
+            if (paletteSize != null) addQuery("fmt.png.palettesize", paletteSize!!)
         }
 
-        if (!dithered) addQuery("fmt.png.dither", "false")
-        if (blur != null) addQuery("blur", "${blur!!.radius},${blur!!.sigma}")
-        if (reduceNoise != null) addQuery("noiser", "$reduceNoise")
-        if (gamma != null) addQuery("gamma", "$gamma")
-        if (hue != null) addQuery("hue", "$hue")
-        if (saturation != null) addQuery("sat", "$saturation")
-        if (brightness != null) addQuery("bri", "$brightness")
+        if (!dithered) addQuery("fmt.png.dither", false)
+        if (blur != null) addQuery("blur", blur!!.radius, blur!!.sigma)
+        if (reduceNoise != null) addQuery("noiser", reduceNoise!!)
+        if (gamma != null) addQuery("gamma", gamma!!)
+        if (hue != null) addQuery("hue", hue!!)
+        if (saturation != null) addQuery("sat", saturation!!)
+        if (brightness != null) addQuery("bri", brightness!!)
 
         layers.forEachIndexed { index, layer ->
-            addQuery("layer${index + 1}", layer.toQuery())
+            addQuery("layer${index + 1}", layer.toQuery(), preEncoded = true)
         }
 
         return builder.toString()

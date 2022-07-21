@@ -14,10 +14,12 @@ import com.amplience.sampleapp.model.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+
 class MainViewModel : ViewModel() {
 
     var appBarTitle by mutableStateOf("")
     var screens by mutableStateOf<List<Screen>>(listOf())
+    var lowBandwidth: Boolean = false
 
     init {
         getExamples()

@@ -11,7 +11,6 @@ abstract class AmplienceImage {
     /**
      * [getUrl] returns a url that can be used with any image loading libraries
      *
-     * @param image - your implementation of an [AmplienceImage]
      * @param builder (optional) - manipulate the image. See [ImageUrlBuilder] for more info
      */
     fun getUrl(

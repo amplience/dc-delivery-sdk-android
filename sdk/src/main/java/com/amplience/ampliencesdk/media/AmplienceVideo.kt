@@ -10,8 +10,12 @@ abstract class AmplienceVideo {
 
     /**
      * [getUrl] returns a url that can be used with any video loading libraries
+     *
+     * @param videoProfile
      */
-    fun getUrl(): String = "https://${defaultHost}/v/${endpoint}/${name}/mp4_720p"
+    fun getUrl(
+        videoProfile: String = "mp4_720p"
+    ): String = "https://${defaultHost}/v/${endpoint}/${name}/$videoProfile"
 
     /**
      * [getThumbnailUrl] returns a url that can be used with any image loading libraries

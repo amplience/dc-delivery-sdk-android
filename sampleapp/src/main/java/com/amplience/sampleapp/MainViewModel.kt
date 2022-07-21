@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.amplience.ampliencesdk.AmplienceManager
+import com.amplience.ampliencesdk.ContentClient
 import com.amplience.ampliencesdk.api.models.FilterBy
 import com.amplience.ampliencesdk.api.models.SortBy
 import com.amplience.ampliencesdk.parseToObject
@@ -14,10 +14,12 @@ import com.amplience.sampleapp.model.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+
 class MainViewModel : ViewModel() {
 
     var appBarTitle by mutableStateOf("")
     var screens by mutableStateOf<List<Screen>>(listOf())
+    var lowBandwidth: Boolean = false
 
     init {
         getExamples()
@@ -27,11 +29,11 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch {
             val exampleScreens = arrayListOf<Screen>(Screen.HomeScreen())
 
-            val bannerRes = AmplienceManager.getInstance().getContentByKey("new-banner-format")
+            val bannerRes = ContentClient.getInstance().getContentByKey("new-banner-format")
             if (bannerRes.isSuccess) {
                 val map = bannerRes.getOrNull() ?: return@launch
                 Timber.d("Map $map")
-                val banner = map.content.parseToObject<Banner>()
+                val banner = map.content?.parseToObject<Banner>()
                 Timber.d("Banner $banner")
 
                 if (banner != null) {
@@ -41,11 +43,11 @@ class MainViewModel : ViewModel() {
                 Timber.e(bannerRes.exceptionOrNull())
             }
 
-            val slidesRes = AmplienceManager.getInstance()
+            val slidesRes = ContentClient.getInstance()
                 .getContentById("bd89c2ed-0ed5-4304-8c89-c0710af500e2")
             if (slidesRes.isSuccess) {
                 val map = slidesRes.getOrNull() ?: return@launch
-                val slides = map.content.parseToObjectList<Slide>("slides")
+                val slides = map.content?.parseToObjectList<Slide>("slides")
                 Timber.d("Slides $slides")
 
                 if (slides != null) {
@@ -56,27 +58,29 @@ class MainViewModel : ViewModel() {
             }
 
             val exampleContentRes =
-                AmplienceManager.getInstance().getContentByKey("example-content-items")
+                ContentClient.getInstance().getContentByKey("example-content-items")
             if (exampleContentRes.isSuccess) {
                 val map = exampleContentRes.getOrNull() ?: return@launch
                 Timber.d("Map $map")
-                val list = map.content.parseToObjectList<Map<String, Any>>("examples")
+                val list = map.content?.parseToObjectList<Map<String, Any>>("examples")
                 val banner = list?.get(0)?.parseToObject<Banner>()
                 val slides = list?.get(1)?.parseToObjectList<ImageSlide>("slides")
                 val text = list?.get(2)?.parseToObject<Text>()
+                val video = list?.get(3)?.parseToObject<Video>("video")
+                Timber.d("Parsed video $video")
 
-                if (banner != null && slides != null && text != null)
-                    exampleScreens.add(
-                        Screen.MultiContentExampleScreen(
-                            banner = banner,
-                            slides = slides,
-                            text = text.text
-                        )
+                exampleScreens.add(
+                    Screen.MultiContentExampleScreen(
+                        banner = banner,
+                        slides = slides,
+                        text = text?.text,
+                        video = video
                     )
+                )
             }
 
             val filterableRes =
-                AmplienceManager.getInstance().getContentByFilters(
+                ContentClient.getInstance().filterContent(
                     FilterBy(
                         "/_meta/schema",
                         "https://example.com/blog-post-filter-and-sort"
@@ -85,7 +89,7 @@ class MainViewModel : ViewModel() {
             if (filterableRes.isSuccess) {
                 val results = filterableRes.getOrNull()
                 Timber.d("Filterable map $results")
-                val blogList = results?.mapNotNull { it.content.parseToObject<BlogPost>() }
+                val blogList = results?.responses?.mapNotNull { it.content?.parseToObject<BlogPost>() }
                 Timber.d("Blog list $blogList")
 
                 if (blogList != null) {
@@ -100,7 +104,7 @@ class MainViewModel : ViewModel() {
             }
 
             val filterableByReadTimeRes =
-                AmplienceManager.getInstance().getContentByFilters(
+                ContentClient.getInstance().filterContent(
                     FilterBy(
                         "/_meta/schema",
                         "https://example.com/blog-post-filter-and-sort"
@@ -109,7 +113,7 @@ class MainViewModel : ViewModel() {
                 )
             if (filterableByReadTimeRes.isSuccess) {
                 val results = filterableByReadTimeRes.getOrNull()
-                val blogList = results?.mapNotNull { it.content.parseToObject<BlogPost>() }
+                val blogList = results?.responses?.mapNotNull { it.content?.parseToObject<BlogPost>() }
 
                 if (blogList != null) {
                     exampleScreens.add(
@@ -125,7 +129,7 @@ class MainViewModel : ViewModel() {
             }
 
             val filterableByHomewareRes =
-                AmplienceManager.getInstance().getContentByFilters(
+                ContentClient.getInstance().filterContent(
                     FilterBy(
                         "/_meta/schema",
                         "https://example.com/blog-post-filter-and-sort"
@@ -137,7 +141,7 @@ class MainViewModel : ViewModel() {
                 )
             if (filterableByHomewareRes.isSuccess) {
                 val results = filterableByHomewareRes.getOrNull()
-                val blogList = results?.mapNotNull { it.content.parseToObject<BlogPost>() }
+                val blogList = results?.responses?.mapNotNull { it.content?.parseToObject<BlogPost>() }
 
                 if (blogList != null) {
                     exampleScreens.add(

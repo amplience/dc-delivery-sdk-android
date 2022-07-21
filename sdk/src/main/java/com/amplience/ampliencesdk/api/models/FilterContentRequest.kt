@@ -1,7 +1,7 @@
 package com.amplience.ampliencesdk.api.models
 
 /**
- * [FilterRequest]
+ * [FilterContentRequest]
  *
  * @property filterBy - [FilterBy]/s to match to
  * If you specify multiple filters then all filters must be matched (AND).
@@ -9,7 +9,7 @@ package com.amplience.ampliencesdk.api.models
  * @property parameters - Override depth, format and locale
  * @property page - Pagination
  */
-data class FilterRequest(
+data class FilterContentRequest(
     val filterBy: List<FilterBy>,
     val sortBy: SortBy? = null,
     val page: Page? = null,
@@ -37,7 +37,7 @@ data class FilterRequest(
      * @property locale
      */
     data class Parameters(
-        val depth: Depth = Depth.All,
+        val depth: ContentDepth = ContentDepth.All,
         val format: Format = Format.Inlined,
         val locale: String? = null
     )

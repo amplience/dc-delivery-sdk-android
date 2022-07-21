@@ -1,6 +1,6 @@
 package com.amplience.ampliencesdk.api.models
 
-enum class Depth {
+enum class ContentDepth {
     Root, All;
 
     override fun toString() = when (this) {

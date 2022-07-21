@@ -1,6 +1,6 @@
 package com.amplience.ampliencesdk.api.models.images
 
-enum class Format {
+enum class ContentFormat {
     Webp, Jp2, Jpeg, Png, Gif, Bmp;
 
     override fun toString(): String = when (this) {

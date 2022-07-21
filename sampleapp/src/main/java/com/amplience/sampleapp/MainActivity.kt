@@ -1,5 +1,6 @@
 package com.amplience.sampleapp
 
+import android.net.ConnectivityManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,6 +13,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -20,6 +22,9 @@ import com.amplience.sampleapp.elements.LoadingView
 import com.amplience.sampleapp.elements.ScreenUI
 import com.amplience.sampleapp.model.Screen
 import com.amplience.sampleapp.ui.theme.SampleAppTheme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class MainActivity : ComponentActivity() {
 
@@ -36,6 +41,40 @@ class MainActivity : ComponentActivity() {
                     Main(viewModel)
                 }
             }
+        }
+
+        checkNetworkSpeed()
+    }
+
+    private fun checkNetworkSpeed() {
+        val cm = this.getSystemService(CONNECTIVITY_SERVICE) as? ConnectivityManager
+        val nc = cm?.getNetworkCapabilities(cm.activeNetwork)
+        if (nc != null) {
+            val downSpeed = nc.linkDownstreamBandwidthKbps
+            val upSpeed = nc.linkUpstreamBandwidthKbps
+
+            /*  Network speeds (approx)
+                2G GSM ~14.4 Kbps
+                G GPRS ~26.8 Kbps
+                E EDGE ~108.8 Kbps
+                3G UMTS ~128 Kbps
+                H HSPA ~3.6 Mbps
+                H+ HSPA+ ~14.4 Mbps-23.0 Mbps
+                4G LTE ~50 Mbps
+                4G LTE-A ~500 Mbps
+            */
+            Timber.d("Down $downSpeed")
+            Timber.d("Up $upSpeed")
+
+            if (downSpeed < 128) {
+                viewModel.lowBandwidth = true
+            }
+        }
+
+        lifecycleScope.launch {
+            // Recheck every minute while activity is running
+            delay(60000)
+            checkNetworkSpeed()
         }
     }
 }

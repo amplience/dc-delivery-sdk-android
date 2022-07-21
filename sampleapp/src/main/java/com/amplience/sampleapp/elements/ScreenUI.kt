@@ -18,6 +18,7 @@ import com.amplience.sampleapp.MainViewModel
 import com.amplience.sampleapp.model.Screen
 import dev.chrisbanes.snapper.ExperimentalSnapperApi
 import dev.chrisbanes.snapper.rememberSnapperFlingBehavior
+import timber.log.Timber
 
 @OptIn(ExperimentalSnapperApi::class)
 @Composable
@@ -59,7 +60,7 @@ fun ScreenUI(
         is Screen.MultiContentExampleScreen -> {
             val lazyListState = rememberLazyListState()
             LazyColumn {
-                item {
+                if (screen.banner != null) item {
                     Banner(
                         banner = screen.banner,
                         modifier = Modifier
@@ -67,7 +68,7 @@ fun ScreenUI(
                             .aspectRatio(2.33f)
                     )
                 }
-                item {
+                if (screen.slides != null) item {
                     LazyRow(
                         state = lazyListState,
                         flingBehavior = rememberSnapperFlingBehavior(lazyListState),
@@ -84,8 +85,12 @@ fun ScreenUI(
                         }
                     }
                 }
-                item {
+                if (screen.text != null) item {
                     Text(text = screen.text, modifier = Modifier.padding(16.dp))
+                }
+                if (screen.video != null) item {
+                    Timber.d("Screen.video ${screen.video}")
+                    VideoUI(video = screen.video, modifier = Modifier.fillMaxWidth().aspectRatio(1.5f))
                 }
             }
         }

@@ -1,5 +1,7 @@
 package com.amplience.ampliencesdk.api.models.images
 
+import java.net.URLEncoder
+
 data class TextLayer(
     val text: String,
     val fontSize: Int? = null, // defaults to 10
@@ -15,25 +17,31 @@ data class TextLayer(
         val builder = StringBuilder("[")
         var firstQuery = true
 
-        fun addQuery(query: String) {
+        fun addQuery(queryName: String, vararg queries: Any) {
             if (firstQuery) {
                 builder.append("?")
                 firstQuery = false
             } else {
                 builder.append("&")
             }
-            builder.append(query)
+            builder.append("$queryName=")
+            queries.forEach { query ->
+                builder.append(URLEncoder.encode(query.toString(), "UTF-8"))
+                if (query != queries.last()) {
+                    builder.append(",")
+                }
+            }
         }
 
-        addQuery("text=$text")
-        fontSize?.let { addQuery("fontSize=$it") }
-        fontFamily?.let { addQuery("fontFamily=$it") }
-        fontStyle?.let { addQuery("fontStyle=$it") }
-        fontWeight?.let { addQuery("fontWeight=$it") }
-        fontStretch?.let { addQuery("fontStretch=$it") }
-        textColor?.let { addQuery("textColor=$it") }
-        textDecoration?.let { addQuery("textDecoration=$it") }
-        textAlign?.let { addQuery("textAlign=$it") }
+        addQuery("text=", text)
+        fontSize?.let { addQuery("fontSize=", it) }
+        fontFamily?.let { addQuery("fontFamily=", it) }
+        fontStyle?.let { addQuery("fontStyle=", it) }
+        fontWeight?.let { addQuery("fontWeight=", it) }
+        fontStretch?.let { addQuery("fontStretch=", it) }
+        textColor?.let { addQuery("textColor=", it) }
+        textDecoration?.let { addQuery("textDecoration=", it) }
+        textAlign?.let { addQuery("textAlign=", it) }
 
         builder.append("]")
         return builder.toString()

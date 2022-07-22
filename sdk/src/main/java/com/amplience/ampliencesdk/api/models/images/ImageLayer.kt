@@ -1,5 +1,7 @@
 package com.amplience.ampliencesdk.api.models.images
 
+import java.net.URLEncoder
+
 data class ImageLayer(
     val src: String,
     val width: Int? = null,
@@ -14,34 +16,48 @@ data class ImageLayer(
     val rightPercent: Int? = null,
     val anchor: Anchor? = null,
     val opacity: Int? = null
-): Layer {
+) : Layer {
     override fun toQuery(): String {
         val builder = StringBuilder("[")
         var firstQuery = true
 
-        fun addQuery(query: String) {
+        fun addQuery(queryName: String, vararg queries: Any, preEncoded: Boolean = false) {
             if (firstQuery) {
-                builder.append("?")
                 firstQuery = false
             } else {
                 builder.append("&")
             }
-            builder.append(query)
+            builder.append("$queryName=")
+            queries.forEachIndexed { index, query ->
+                builder.append(
+                    if (preEncoded) {
+                        query.toString()
+                    } else {
+                        URLEncoder.encode(
+                            query.toString(),
+                            "UTF-8"
+                        )
+                    }
+                )
+                if (index != queries.indices.last()) {
+                    builder.append(",")
+                }
+            }
         }
 
-        addQuery("src=$src")
-        width?.let { addQuery("w=$it") }
-        height?.let { addQuery("h=$it") }
-        topPx?.let { addQuery("top=$it") }
-        topPercent?.let { addQuery("top=$it") }
-        leftPx?.let { addQuery("left=$it") }
-        leftPercent?.let { addQuery("left=$it") }
-        bottomPx?.let { addQuery("bottom=$it") }
-        bottomPercent?.let { addQuery("bottom=$it") }
-        rightPx?.let { addQuery("right=$it") }
-        rightPercent?.let { addQuery("right=$it") }
-        anchor?.let { addQuery("anchor=$it") }
-        opacity?.let { addQuery("opacity=$it") }
+        addQuery("src", src, preEncoded = true)
+        width?.let { addQuery("w", it) }
+        height?.let { addQuery("h", it) }
+        topPx?.let { addQuery("top", it) }
+        topPercent?.let { addQuery("top", "$it%", preEncoded = true) }
+        leftPx?.let { addQuery("left", it) }
+        leftPercent?.let { addQuery("left", "$it%", preEncoded = true) }
+        bottomPx?.let { addQuery("bottom", it) }
+        bottomPercent?.let { addQuery("bottom", "$it%", preEncoded = true) }
+        rightPx?.let { addQuery("right", it) }
+        rightPercent?.let { addQuery("right", "$it%", preEncoded = true) }
+        anchor?.let { addQuery("anchor", it) }
+        opacity?.let { addQuery("opacity", it) }
 
         builder.append("]")
         return builder.toString()

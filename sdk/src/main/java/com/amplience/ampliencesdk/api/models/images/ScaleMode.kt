@@ -39,8 +39,8 @@ sealed class ScaleMode {
         BottomLeft -> "bl"
         BottomCenter -> "bc"
         BottomRight -> "br"
-        is AspectRatio -> "aspect&aspect=$ratio"
-        is Edge -> "edge&resize.edge=$type&resize.edge.length=$length"
+        is AspectRatio -> "aspect"
+        is Edge -> "edge"
         is Clamp -> "clamp"
     }
 }

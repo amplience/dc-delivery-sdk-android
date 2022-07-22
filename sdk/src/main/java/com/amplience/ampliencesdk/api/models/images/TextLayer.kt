@@ -1,5 +1,7 @@
 package com.amplience.ampliencesdk.api.models.images
 
+import java.net.URLEncoder
+
 data class TextLayer(
     val text: String,
     val fontSize: Int? = null, // defaults to 10
@@ -15,25 +17,39 @@ data class TextLayer(
         val builder = StringBuilder("[")
         var firstQuery = true
 
-        fun addQuery(query: String) {
+        fun addQuery(queryName: String, vararg queries: Any, preEncoded: Boolean = false) {
             if (firstQuery) {
-                builder.append("?")
                 firstQuery = false
             } else {
                 builder.append("&")
             }
-            builder.append(query)
+            builder.append("$queryName=")
+            queries.forEachIndexed { index, query ->
+                builder.append(
+                    if (preEncoded) {
+                        query.toString()
+                    } else {
+                        URLEncoder.encode(
+                            query.toString(),
+                            "UTF-8"
+                        )
+                    }
+                )
+                if (index != queries.indices.last()) {
+                    builder.append(",")
+                }
+            }
         }
 
-        addQuery("text=$text")
-        fontSize?.let { addQuery("fontSize=$it") }
-        fontFamily?.let { addQuery("fontFamily=$it") }
-        fontStyle?.let { addQuery("fontStyle=$it") }
-        fontWeight?.let { addQuery("fontWeight=$it") }
-        fontStretch?.let { addQuery("fontStretch=$it") }
-        textColor?.let { addQuery("textColor=$it") }
-        textDecoration?.let { addQuery("textDecoration=$it") }
-        textAlign?.let { addQuery("textAlign=$it") }
+        addQuery("text", text)
+        fontSize?.let { addQuery("fontSize", it) }
+        fontFamily?.let { addQuery("fontFamily", it) }
+        fontStyle?.let { addQuery("fontStyle", it) }
+        fontWeight?.let { addQuery("fontWeight", it) }
+        fontStretch?.let { addQuery("fontStretch", it) }
+        textColor?.let { addQuery("textColor", it.toString(), preEncoded = true) }
+        textDecoration?.let { addQuery("textDecoration", it) }
+        textAlign?.let { addQuery("textAlign", it) }
 
         builder.append("]")
         return builder.toString()
@@ -74,14 +90,21 @@ data class TextLayer(
     }
 
     sealed class TextColor {
-        data class Hex(val hex: String): TextColor()
-        data class RGB(val red: Int, val green: Int, val blue: Int): TextColor()
-        data class ColorName(val name: String): TextColor()
-
-        override fun toString(): String = when (this) {
-            is ColorName -> name
-            is Hex -> hex
-            is RGB -> "rgb($red,$green,$blue)"
+        data class Hex(val hex: String): TextColor() {
+            override fun toString(): String {
+                val noHash = hex.removePrefix("#")
+                val encoded = URLEncoder.encode(
+                    noHash,
+                    "UTF-8"
+                )
+                return "#$encoded"
+            }
+        }
+        data class RGB(val red: Int, val green: Int, val blue: Int): TextColor() {
+            override fun toString(): String = "rgb($red,$green,$blue)"
+        }
+        data class ColorName(val name: String): TextColor() {
+            override fun toString(): String = URLEncoder.encode(name, "UTF-8")
         }
     }
 

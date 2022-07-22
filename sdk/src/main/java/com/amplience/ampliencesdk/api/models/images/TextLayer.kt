@@ -17,7 +17,7 @@ data class TextLayer(
         val builder = StringBuilder("[")
         var firstQuery = true
 
-        fun addQuery(queryName: String, vararg queries: Any) {
+        fun addQuery(queryName: String, vararg queries: Any, preEncoded: Boolean = false) {
             if (firstQuery) {
                 firstQuery = false
             } else {
@@ -25,7 +25,16 @@ data class TextLayer(
             }
             builder.append("$queryName=")
             queries.forEachIndexed { index, query ->
-                builder.append(URLEncoder.encode(query.toString(), "UTF-8"))
+                builder.append(
+                    if (preEncoded) {
+                        query.toString()
+                    } else {
+                        URLEncoder.encode(
+                            query.toString(),
+                            "UTF-8"
+                        )
+                    }
+                )
                 if (index != queries.indices.last()) {
                     builder.append(",")
                 }
@@ -38,7 +47,7 @@ data class TextLayer(
         fontStyle?.let { addQuery("fontStyle", it) }
         fontWeight?.let { addQuery("fontWeight", it) }
         fontStretch?.let { addQuery("fontStretch", it) }
-        textColor?.let { addQuery("textColor", it) }
+        textColor?.let { addQuery("textColor", it.toString(), preEncoded = true) }
         textDecoration?.let { addQuery("textDecoration", it) }
         textAlign?.let { addQuery("textAlign", it) }
 
@@ -81,14 +90,21 @@ data class TextLayer(
     }
 
     sealed class TextColor {
-        data class Hex(val hex: String): TextColor()
-        data class RGB(val red: Int, val green: Int, val blue: Int): TextColor()
-        data class ColorName(val name: String): TextColor()
-
-        override fun toString(): String = when (this) {
-            is ColorName -> name
-            is Hex -> hex
-            is RGB -> "rgb($red,$green,$blue)"
+        data class Hex(val hex: String): TextColor() {
+            override fun toString(): String {
+                val noHash = hex.removePrefix("#")
+                val encoded = URLEncoder.encode(
+                    noHash,
+                    "UTF-8"
+                )
+                return "#$encoded"
+            }
+        }
+        data class RGB(val red: Int, val green: Int, val blue: Int): TextColor() {
+            override fun toString(): String = "rgb($red,$green,$blue)"
+        }
+        data class ColorName(val name: String): TextColor() {
+            override fun toString(): String = URLEncoder.encode(name, "UTF-8")
         }
     }
 

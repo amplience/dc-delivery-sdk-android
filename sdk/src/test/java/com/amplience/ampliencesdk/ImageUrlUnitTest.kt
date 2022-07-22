@@ -4,6 +4,7 @@ import com.amplience.ampliencesdk.api.models.images.*
 import com.amplience.ampliencesdk.media.AmplienceImage
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.w3c.dom.Text
 
 class ImageUrlUnitTest {
 
@@ -743,6 +744,206 @@ class ImageUrlUnitTest {
             "https://cdn.media.amplience.net/i/ampproduct/test-image?layer1=[text=Hello]",
             testImage.getUrl {
                 addTextLayer(text = "Hello")
+            }
+        )
+    }
+
+    @Test
+    fun `create image url with text layer with font size`() {
+        assertEquals(
+            "https://cdn.media.amplience.net/i/ampproduct/test-image?layer1=[text=Hello&fontSize=20]",
+            testImage.getUrl {
+                addTextLayer(
+                    text = "Hello",
+                    fontSize = 20
+                )
+            }
+        )
+    }
+
+    @Test
+    fun `create image url with text layer and font family`() {
+        assertEquals(
+            "https://cdn.media.amplience.net/i/ampproduct/test-image?layer1=[text=Hello&fontFamily=Helevetica]",
+            testImage.getUrl {
+                addTextLayer(
+                    text = "Hello",
+                    fontFamily = "Helevetica"
+                )
+            }
+        )
+    }
+
+    @Test
+    fun `create image url with text layer and font style`() {
+        assertEquals(
+            "https://cdn.media.amplience.net/i/ampproduct/test-image?layer1=[text=Hello&fontStyle=italic]",
+            testImage.getUrl {
+                addTextLayer(
+                    text = "Hello",
+                    fontStyle = TextLayer.FontStyle.Italic
+                )
+            }
+        )
+    }
+
+    @Test
+    fun `create image url with text layer and font weight`() {
+        assertEquals(
+            "https://cdn.media.amplience.net/i/ampproduct/test-image?layer1=[text=Hello&fontWeight=700]",
+            testImage.getUrl {
+                addTextLayer(
+                    text = "Hello",
+                    fontWeight = 700
+                )
+            }
+        )
+    }
+
+    @Test
+    fun `create image url with text layer and font stretch`() {
+        assertEquals(
+            "https://cdn.media.amplience.net/i/ampproduct/test-image?layer1=[text=Hello&fontStretch=semi-condensed]",
+            testImage.getUrl {
+                addTextLayer(
+                    text = "Hello",
+                    fontStretch = TextLayer.FontStretch.SemiCondensed
+                )
+            }
+        )
+    }
+
+    @Test
+    fun `create image url with text layer and named text color`() {
+        assertEquals(
+            "https://cdn.media.amplience.net/i/ampproduct/test-image?layer1=[text=Hello&textColor=Blue]",
+            testImage.getUrl {
+                addTextLayer(
+                    text = "Hello",
+                    textColor = TextLayer.TextColor.ColorName("Blue")
+                )
+            }
+        )
+    }
+
+    @Test
+    fun `create image url with text layer and hex text color`() {
+        assertEquals(
+            "https://cdn.media.amplience.net/i/ampproduct/test-image?layer1=[text=Hello&textColor=#AABBCC]",
+            testImage.getUrl {
+                addTextLayer(
+                    text = "Hello",
+                    textColor = TextLayer.TextColor.Hex("#AABBCC")
+                )
+            }
+        )
+    }
+
+    @Test
+    fun `create image url with text layer and rgb text color`() {
+        assertEquals(
+            "https://cdn.media.amplience.net/i/ampproduct/test-image?layer1=[text=Hello&textColor=rgb(50,150,250)]",
+            testImage.getUrl {
+                addTextLayer(
+                    text = "Hello",
+                    textColor = TextLayer.TextColor.RGB(50, 150, 250)
+                )
+            }
+        )
+    }
+
+    @Test
+    fun `create image url with text layer and line through text decoration`() {
+        assertEquals(
+            "https://cdn.media.amplience.net/i/ampproduct/test-image?layer1=[text=Hello&textDecoration=linethrough]",
+            testImage.getUrl {
+                addTextLayer(
+                    text = "Hello",
+                    textDecoration = TextLayer.Decoration.LineThrough
+                )
+            }
+        )
+    }
+
+    @Test
+    fun `create image url with text layer and center text align`() {
+        assertEquals(
+            "https://cdn.media.amplience.net/i/ampproduct/test-image?layer1=[text=Hello&textAlign=center]",
+            testImage.getUrl {
+                addTextLayer(
+                    text = "Hello",
+                    textAlign = "center"
+                )
+            }
+        )
+    }
+
+    @Test
+    fun `create image url with text layer and all attributes`() {
+        assertEquals(
+            "https://cdn.media.amplience.net/i/ampproduct/test-image?layer1=[text=Hello&fontSize=20&fontFamily=Helvetica&fontStyle=oblique&fontWeight=700&fontStretch=condensed&textColor=Blue&textDecoration=overline&textAlign=center]",
+            testImage.getUrl {
+                addTextLayer(
+                    text = "Hello",
+                    fontSize = 20,
+                    fontFamily = "Helvetica",
+                    fontStyle = TextLayer.FontStyle.Oblique,
+                    fontWeight = 700,
+                    fontStretch = TextLayer.FontStretch.Condensed,
+                    textColor = TextLayer.TextColor.ColorName("Blue"),
+                    textDecoration = TextLayer.Decoration.Overline,
+                    textAlign = "center"
+                )
+            }
+        )
+    }
+
+    @Test
+    fun `create image url with image layer`() {
+        assertEquals(
+            "https://cdn.media.amplience.net/i/ampproduct/test-image?layer1=[src=/i//exampleRoundel]",
+            testImage.getUrl {
+                addImageLayer(src = "/i//exampleRoundel")
+            }
+        )
+    }
+
+    @Test
+    fun `create image url with image layer and position`() {
+        assertEquals(
+            "https://cdn.media.amplience.net/i/ampproduct/test-image?layer1=[src=/i//exampleRoundel&top=30&left=40%]",
+            testImage.getUrl {
+                addImageLayer(
+                    src = "/i//exampleRoundel",
+                    topPx = 30,
+                    leftPercent = 40
+                )
+            }
+        )
+    }
+
+    @Test
+    fun `create image url with image layer and anchor`() {
+        assertEquals(
+            "https://cdn.media.amplience.net/i/ampproduct/test-image?layer1=[src=/i//exampleRoundel&anchor=BC]",
+            testImage.getUrl {
+                addImageLayer(
+                    src = "/i//exampleRoundel",
+                    anchor = Anchor.BottomCenter
+                )
+            }
+        )
+    }
+
+    @Test
+    fun `create image url with image layer and opacity`() {
+        assertEquals(
+            "https://cdn.media.amplience.net/i/ampproduct/test-image?layer1=[src=/i//exampleRoundel&opacity=30]",
+            testImage.getUrl {
+                addImageLayer(
+                    src = "/i//exampleRoundel",
+                    opacity = 30
+                )
             }
         )
     }

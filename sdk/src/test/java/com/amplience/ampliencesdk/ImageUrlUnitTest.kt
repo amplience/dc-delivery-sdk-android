@@ -158,7 +158,6 @@ class ImageUrlUnitTest {
 
     @Test
     fun `create image url with max scale mode aspect ratio`() {
-        // FIXME expected:<...test-image?sm=aspect[%26aspect%3D16%3A]9> but was:<...test-image?sm=aspect[&aspect=16:]9>
         assertEquals(
             "https://cdn.media.amplience.net/i/ampproduct/test-image?sm=aspect&aspect=16:9",
             testImage.getUrl {
@@ -169,7 +168,6 @@ class ImageUrlUnitTest {
 
     @Test
     fun `create image url with max scale mode edge`() {
-        // FIXME expected:<...t/test-image?sm=edge[%26resize.edge%3Dw%26resize.edge.length%3D]200> but was:<...t/test-image?sm=edge[&resize.edge=w&resize.edge.length=]200>
         assertEquals(
             "https://cdn.media.amplience.net/i/ampproduct/test-image?sm=edge&resize.edge=w&resize.edge.length=200",
             testImage.getUrl { scaleMode(ScaleMode.Edge(ScaleMode.Edge.EdgeType.Width, 200)) }
@@ -258,7 +256,6 @@ class ImageUrlUnitTest {
 
     @Test
     fun `create image url with crop`() {
-        // FIXME expected:<...t/test-image?crop=10[%2C20%2C30%2C]40> but was:<...t/test-image?crop=10[,20,30,]40>
         assertEquals(
             "https://cdn.media.amplience.net/i/ampproduct/test-image?crop=10,20,30,40",
             testImage.getUrl { crop(x = 10, y = 20, w = 30, h = 40) }
@@ -267,7 +264,6 @@ class ImageUrlUnitTest {
 
     @Test
     fun `create image url with edge crop`() {
-        // FIXME expected <.../test-image?ecrop=10[%2C20%2C30%2C]40> but was:<.../test-image?ecrop=10[,20,30,]40>
         assertEquals(
             "https://cdn.media.amplience.net/i/ampproduct/test-image?ecrop=10,20,30,40",
             testImage.getUrl { edgeCrop(left = 10, top = 20, right = 30, bottom = 40) }
@@ -276,7 +272,6 @@ class ImageUrlUnitTest {
 
     @Test
     fun `create image url with pre crop`() {
-        // FIXME expected:<.../test-image?pcrop=10[%2C20%2C30%2C]40> but was:<.../test-image?pcrop=10[,20,30,]40>
         assertEquals(
             "https://cdn.media.amplience.net/i/ampproduct/test-image?pcrop=10,20,30,40",
             testImage.getUrl { preCrop(x = 10, y = 20, w = 30, h = 40) }
@@ -285,7 +280,6 @@ class ImageUrlUnitTest {
 
     @Test
     fun `create image url with pre edge crop`() {
-        // FIXME expected:<...test-image?pecrop=10[%2C20%2C30%2C]40> but was:<...test-image?pecrop=10[,20,30,]40>
         assertEquals(
             "https://cdn.media.amplience.net/i/ampproduct/test-image?pecrop=10,20,30,40",
             testImage.getUrl { preEdgeCrop(left = 10, top = 20, right = 30, bottom = 40) }
@@ -334,7 +328,6 @@ class ImageUrlUnitTest {
 
     @Test
     fun `create image url with vertical flip`() {
-        // FIXME expected:<...ct/test-image?flipv=[]true> but was:<...ct/test-image?flipv=[+]true>
         assertEquals(
             "https://cdn.media.amplience.net/i/ampproduct/test-image?flipv=true",
             testImage.getUrl { flipVertically() }
@@ -479,7 +472,6 @@ class ImageUrlUnitTest {
 
     @Test
     fun `create image url with no chroma subsampling`() {
-        // FIXME expected:<...ge?fmt.jpeg.chroma=1[,1,]1> but was:<...ge?fmt.jpeg.chroma=1[%2C1%2C]1>
         assertEquals(
             "https://cdn.media.amplience.net/i/ampproduct/test-image?fmt.jpeg.chroma=1,1,1",
             testImage.getUrl { chromaSubsampling(false) }
@@ -568,7 +560,6 @@ class ImageUrlUnitTest {
 
     @Test
     fun `create image url with unsharp`() {
-        // FIXME expected:<...test-image?unsharp=3[,0.05,150,]100> but was:<...test-image?unsharp=3[%2C0.05%2C150%2C]100>
         assertEquals(
             "https://cdn.media.amplience.net/i/ampproduct/test-image?unsharp=3,0.05,150,100",
             testImage.getUrl {
@@ -699,7 +690,6 @@ class ImageUrlUnitTest {
 
     @Test
     fun `create image url with blur`() {
-        // FIXME expected:<...t/test-image?blur=30[,]60> but was:<...t/test-image?blur=30[%2C]60>
         assertEquals(
             "https://cdn.media.amplience.net/i/ampproduct/test-image?blur=30,60",
             testImage.getUrl {

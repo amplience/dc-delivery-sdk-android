@@ -739,9 +739,8 @@ class ImageUrlUnitTest {
 
     @Test
     fun `create image url with text layer`() {
-        // FIXME expected:<...uct/test-image?layer[0=[text=Hello]]> but was:<...uct/test-image?layer[1=%5B%3Ftext%3DHello%5D]>
         assertEquals(
-            "https://cdn.media.amplience.net/i/ampproduct/test-image?layer0=[text=Hello]",
+            "https://cdn.media.amplience.net/i/ampproduct/test-image?layer1=[text=Hello]",
             testImage.getUrl {
                 addTextLayer(text = "Hello")
             }

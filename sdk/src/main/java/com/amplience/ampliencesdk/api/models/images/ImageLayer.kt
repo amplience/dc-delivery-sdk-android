@@ -29,9 +29,9 @@ data class ImageLayer(
                 builder.append("&")
             }
             builder.append("$queryName=")
-            queries.forEach { query ->
+            queries.forEachIndexed { index, query ->
                 builder.append(URLEncoder.encode(query.toString(), "UTF-8"))
-                if (query != queries.last()) {
+                if (index != queries.indices.last()) {
                     builder.append(",")
                 }
             }

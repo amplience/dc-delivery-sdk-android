@@ -249,7 +249,7 @@ class ImageUrlBuilder {
                 builder.append("&")
             }
             builder.append("$queryName=")
-            queries.forEach { query ->
+            queries.forEachIndexed { index, query ->
                 builder.append(
                     if (preEncoded) {
                         query.toString()
@@ -260,7 +260,7 @@ class ImageUrlBuilder {
                         )
                     }
                 )
-                if (query != queries.last()) {
+                if (index != queries.indices.last()) {
                     builder.append(",")
                 }
             }
@@ -278,7 +278,13 @@ class ImageUrlBuilder {
                 val encodedRatio = ratioParts.joinToString(separator = ":") {
                     URLEncoder.encode(it, "UTF-8")
                 }
-                addQuery("aspect=", encodedRatio, preEncoded = true)
+                addQuery("aspect", encodedRatio, preEncoded = true)
+            }
+            if (scaleMode is ScaleMode.Edge) {
+                val type = (scaleMode as ScaleMode.Edge).type
+                val length = (scaleMode as ScaleMode.Edge).length
+                addQuery("resize.edge", type)
+                addQuery("resize.edge.length", length)
             }
         }
         if (scaleFit != null) addQuery("scalefit", scaleFit!!)
@@ -356,7 +362,8 @@ class ImageUrlBuilder {
         if (backgroundRgb != null)
             addQuery(
                 "bg",
-                "rgb(${backgroundRgb!!.first},${backgroundRgb!!.second},${backgroundRgb!!.third})"
+                "rgb(${backgroundRgb!!.first},${backgroundRgb!!.second},${backgroundRgb!!.third})",
+                preEncoded = true
             )
 
         if (indexed) {

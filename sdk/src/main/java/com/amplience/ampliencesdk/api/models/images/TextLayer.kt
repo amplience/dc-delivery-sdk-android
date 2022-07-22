@@ -19,29 +19,28 @@ data class TextLayer(
 
         fun addQuery(queryName: String, vararg queries: Any) {
             if (firstQuery) {
-                builder.append("?")
                 firstQuery = false
             } else {
                 builder.append("&")
             }
             builder.append("$queryName=")
-            queries.forEach { query ->
+            queries.forEachIndexed { index, query ->
                 builder.append(URLEncoder.encode(query.toString(), "UTF-8"))
-                if (query != queries.last()) {
+                if (index != queries.indices.last()) {
                     builder.append(",")
                 }
             }
         }
 
-        addQuery("text=", text)
-        fontSize?.let { addQuery("fontSize=", it) }
-        fontFamily?.let { addQuery("fontFamily=", it) }
-        fontStyle?.let { addQuery("fontStyle=", it) }
-        fontWeight?.let { addQuery("fontWeight=", it) }
-        fontStretch?.let { addQuery("fontStretch=", it) }
-        textColor?.let { addQuery("textColor=", it) }
-        textDecoration?.let { addQuery("textDecoration=", it) }
-        textAlign?.let { addQuery("textAlign=", it) }
+        addQuery("text", text)
+        fontSize?.let { addQuery("fontSize", it) }
+        fontFamily?.let { addQuery("fontFamily", it) }
+        fontStyle?.let { addQuery("fontStyle", it) }
+        fontWeight?.let { addQuery("fontWeight", it) }
+        fontStretch?.let { addQuery("fontStretch", it) }
+        textColor?.let { addQuery("textColor", it) }
+        textDecoration?.let { addQuery("textDecoration", it) }
+        textAlign?.let { addQuery("textAlign", it) }
 
         builder.append("]")
         return builder.toString()

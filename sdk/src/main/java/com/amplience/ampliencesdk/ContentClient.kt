@@ -3,8 +3,12 @@ package com.amplience.ampliencesdk
 import android.content.Context
 import android.util.Log
 import com.amplience.ampliencesdk.api.Api
+import com.amplience.ampliencesdk.api.ContentCallback
 import com.amplience.ampliencesdk.api.RetrofitClient
 import com.amplience.ampliencesdk.api.models.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class ContentClient private constructor(
     context: Context,
@@ -37,7 +41,11 @@ class ContentClient private constructor(
          *
          * @return [ContentClient]
          */
-        fun newInstance(context: Context, hub: String, configuration: Configuration = Configuration()): ContentClient =
+        fun newInstance(
+            context: Context,
+            hub: String,
+            configuration: Configuration = Configuration()
+        ): ContentClient =
             ContentClient(context, hub, configuration)
 
         /**
@@ -49,7 +57,11 @@ class ContentClient private constructor(
          * Creates an instance of the [ContentClient] which
          * can be subsequently called with [getInstance]
          */
-        fun initialise(context: Context, hub: String, configuration: Configuration = Configuration()) {
+        fun initialise(
+            context: Context,
+            hub: String,
+            configuration: Configuration = Configuration()
+        ) {
             sdkManager = ContentClient(context, hub, configuration)
         }
     }
@@ -103,6 +115,31 @@ class ContentClient private constructor(
     }
 
     /**
+     * [getContentById]
+     * @param id - the id of the object you want to retrieve
+     * @param callback - get the result or error
+     */
+    fun getContentById(id: String, callback: ContentCallback<ListContentResponse?>) {
+        val call = api.getContentByIdAsync(id)
+        call.enqueue(object : Callback<ListContentResponse> {
+            override fun onResponse(
+                call: Call<ListContentResponse>,
+                response: Response<ListContentResponse>
+            ) {
+                callback.onSuccess(response.body())
+            }
+
+            override fun onFailure(call: Call<ListContentResponse>, t: Throwable) {
+                if (t is Exception) {
+                    callback.onError(t)
+                } else {
+                    callback.onError(Exception(t.localizedMessage))
+                }
+            }
+        })
+    }
+
+    /**
      * [getContentByKey]
      * @param key - the key of the object you want to retrieve
      *
@@ -123,6 +160,31 @@ class ContentClient private constructor(
         } else {
             Result.failure(Exception(res.errorBody()?.string()))
         }
+    }
+
+    /**
+     * [getContentByKey]
+     * @param key - the key of the object you want to retrieve
+     * @param callback - get the result or error
+     */
+    fun getContentByKey(key: String, callback: ContentCallback<ListContentResponse?>) {
+        val call = api.getContentByKeyAsync(key)
+        call.enqueue(object : Callback<ListContentResponse> {
+            override fun onResponse(
+                call: Call<ListContentResponse?>,
+                response: Response<ListContentResponse>
+            ) {
+                callback.onSuccess(response.body())
+            }
+
+            override fun onFailure(call: Call<ListContentResponse?>, t: Throwable) {
+                if (t is Exception) {
+                    callback.onError(t)
+                } else {
+                    callback.onError(Exception(t.localizedMessage))
+                }
+            }
+        })
     }
 
     /**
@@ -164,6 +226,46 @@ class ContentClient private constructor(
     }
 
     /**
+     * [filterContent]
+     * @param filters - any number of [FilterBy] key value pairs
+     * @param callback - get the result or error
+     * @param sortBy (optional) - a key [SortBy.key] and optional order
+     * @param page (optional) - pagination
+     * @param locale (optional) - to override default locale
+     */
+    fun filterContent(
+        vararg filters: FilterBy,
+        callback: ContentCallback<FilterContentResponse?>,
+        sortBy: SortBy? = null,
+        page: FilterContentRequest.Page? = null,
+        locale: String? = null
+    ) {
+        val filterRequest = FilterContentRequest(
+            filterBy = filters.toList(),
+            sortBy = sortBy,
+            page = page,
+            parameters = FilterContentRequest.Parameters(locale = locale)
+        )
+        val call = api.filterContentAsync(filterRequest)
+        call.enqueue(object : Callback<FilterContentResponse> {
+            override fun onResponse(
+                call: Call<FilterContentResponse>,
+                response: Response<FilterContentResponse>
+            ) {
+                callback.onSuccess(response.body())
+            }
+
+            override fun onFailure(call: Call<FilterContentResponse>, t: Throwable) {
+                if (t is Exception) {
+                    callback.onError(t)
+                } else {
+                    callback.onError(Exception(t.localizedMessage))
+                }
+            }
+        })
+    }
+
+    /**
      * [listContent]
      * @param requests - ids or keys of content to get
      * @param locale (optional) - to override default locale
@@ -193,6 +295,41 @@ class ContentClient private constructor(
         } else {
             Result.failure(Exception(res.errorBody()?.string()))
         }
+    }
+
+    /**
+     * [listContent]
+     * @param requests - ids or keys of content to get
+     * @param callback - get the result or error
+     * @param locale (optional) - to override default locale
+     */
+    fun listContent(
+        vararg requests: Request,
+        callback: ContentCallback<List<ListContentResponse>?>,
+        locale: String? = null
+    ) {
+        val call = api.getMultipleContentAsync(
+            ListContentRequest(
+                requests.toList(),
+                parameters = FilterContentRequest.Parameters(locale = locale)
+            )
+        )
+        call.enqueue(object : Callback<List<ListContentResponse>> {
+            override fun onResponse(
+                call: Call<List<ListContentResponse>>,
+                response: Response<List<ListContentResponse>>
+            ) {
+                callback.onSuccess(response.body())
+            }
+
+            override fun onFailure(call: Call<List<ListContentResponse>>, t: Throwable) {
+                if (t is Exception) {
+                    callback.onError(t)
+                } else {
+                    callback.onError(Exception(t.localizedMessage))
+                }
+            }
+        })
     }
 
     /**
@@ -228,6 +365,42 @@ class ContentClient private constructor(
     }
 
     /**
+     * [listContentById]
+     * @param ids - list of ids of content to get
+     * @param callback - get the result or error
+     * @param locale (optional) - to override default locale
+     */
+    fun listContentById(
+        vararg ids: String,
+        callback: ContentCallback<List<ListContentResponse>?>,
+        locale: String? = null
+    ) {
+        val call = api.getMultipleContentAsync(
+            ListContentRequest(
+                ids.map { id -> Request(id = id) },
+                parameters = FilterContentRequest.Parameters(locale = locale)
+            )
+        )
+
+        call.enqueue(object : Callback<List<ListContentResponse>> {
+            override fun onResponse(
+                call: Call<List<ListContentResponse>>,
+                response: Response<List<ListContentResponse>>
+            ) {
+                callback.onSuccess(response.body())
+            }
+
+            override fun onFailure(call: Call<List<ListContentResponse>>, t: Throwable) {
+                if (t is Exception) {
+                    callback.onError(t)
+                } else {
+                    callback.onError(Exception(t.localizedMessage))
+                }
+            }
+        })
+    }
+
+    /**
      * [listContentByKey]
      * @param keys - list of keys of content to get
      * @param locale (optional) - to override default locale
@@ -257,5 +430,40 @@ class ContentClient private constructor(
         } else {
             Result.failure(Exception(res.errorBody()?.string()))
         }
+    }
+
+    /**
+     * [listContentByKey]
+     * @param keys - list of keys of content to get
+     * @param callback - get the result or error
+     * @param locale (optional) - to override default locale
+     */
+    fun listContentByKey(
+        vararg keys: String,
+        callback: ContentCallback<List<ListContentResponse>?>,
+        locale: String? = null
+    ) {
+        val call = api.getMultipleContentAsync(
+            ListContentRequest(
+                keys.map { key -> Request(key = key) },
+                parameters = FilterContentRequest.Parameters(locale = locale)
+            )
+        )
+        call.enqueue(object : Callback<List<ListContentResponse>> {
+            override fun onResponse(
+                call: Call<List<ListContentResponse>>,
+                response: Response<List<ListContentResponse>>
+            ) {
+                callback.onSuccess(response.body())
+            }
+
+            override fun onFailure(call: Call<List<ListContentResponse>>, t: Throwable) {
+                if (t is Exception) {
+                    callback.onError(t)
+                } else {
+                    callback.onError(Exception(t.localizedMessage))
+                }
+            }
+        })
     }
 }

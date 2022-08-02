@@ -13,6 +13,7 @@ abstract class AmplienceImage {
      *
      * @param builder (optional) - manipulate the image. See [ImageUrlBuilder] for more info
      */
+    @JvmOverloads
     fun getUrl(
         builder: ImageUrlBuilder.() -> Unit = {}
     ): String {

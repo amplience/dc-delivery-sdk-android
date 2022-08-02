@@ -16,7 +16,7 @@ abstract class AmplienceImage {
     fun getUrl(
         builder: ImageUrlBuilder.() -> Unit = {}
     ): String {
-        var string = "https://${defaultHost}/i/${endpoint}/${name}"
+        var string = "https://$defaultHost/i/$endpoint/$name"
         string += ImageUrlBuilder().apply(builder).build()
         return string
     }

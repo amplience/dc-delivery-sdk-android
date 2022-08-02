@@ -1,6 +1,5 @@
 package com.amplience.ampliencesdk
 
-import com.amplience.ampliencesdk.api.models.images.*
 import com.amplience.ampliencesdk.media.AmplienceImage
 import org.junit.Assert.assertEquals
 import org.junit.Test

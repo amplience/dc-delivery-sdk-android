@@ -12,7 +12,7 @@ data class TextLayer(
     val textColor: TextColor? = null,
     val textDecoration: Decoration? = null,
     val textAlign: String? = null
-): Layer {
+) : Layer {
     override fun toQuery(): String {
         val builder = StringBuilder("[")
         var firstQuery = true
@@ -90,7 +90,7 @@ data class TextLayer(
     }
 
     sealed class TextColor {
-        data class Hex(val hex: String): TextColor() {
+        data class Hex(val hex: String) : TextColor() {
             override fun toString(): String {
                 val noHash = hex.removePrefix("#")
                 val encoded = URLEncoder.encode(
@@ -100,10 +100,12 @@ data class TextLayer(
                 return "#$encoded"
             }
         }
-        data class RGB(val red: Int, val green: Int, val blue: Int): TextColor() {
+
+        data class RGB(val red: Int, val green: Int, val blue: Int) : TextColor() {
             override fun toString(): String = "rgb($red,$green,$blue)"
         }
-        data class ColorName(val name: String): TextColor() {
+
+        data class ColorName(val name: String) : TextColor() {
             override fun toString(): String = URLEncoder.encode(name, "UTF-8")
         }
     }

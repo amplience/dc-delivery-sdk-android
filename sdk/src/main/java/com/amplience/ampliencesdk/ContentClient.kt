@@ -4,7 +4,13 @@ import android.content.Context
 import android.util.Log
 import com.amplience.ampliencesdk.api.Api
 import com.amplience.ampliencesdk.api.RetrofitClient
-import com.amplience.ampliencesdk.api.models.*
+import com.amplience.ampliencesdk.api.models.FilterBy
+import com.amplience.ampliencesdk.api.models.FilterContentRequest
+import com.amplience.ampliencesdk.api.models.FilterContentResponse
+import com.amplience.ampliencesdk.api.models.ListContentRequest
+import com.amplience.ampliencesdk.api.models.ListContentResponse
+import com.amplience.ampliencesdk.api.models.Request
+import com.amplience.ampliencesdk.api.models.SortBy
 
 class ContentClient private constructor(
     context: Context,
@@ -37,7 +43,11 @@ class ContentClient private constructor(
          *
          * @return [ContentClient]
          */
-        fun newInstance(context: Context, hub: String, configuration: Configuration = Configuration()): ContentClient =
+        fun newInstance(
+            context: Context,
+            hub: String,
+            configuration: Configuration = Configuration()
+        ): ContentClient =
             ContentClient(context, hub, configuration)
 
         /**
@@ -49,7 +59,11 @@ class ContentClient private constructor(
          * Creates an instance of the [ContentClient] which
          * can be subsequently called with [getInstance]
          */
-        fun initialise(context: Context, hub: String, configuration: Configuration = Configuration()) {
+        fun initialise(
+            context: Context,
+            hub: String,
+            configuration: Configuration = Configuration()
+        ) {
             sdkManager = ContentClient(context, hub, configuration)
         }
     }

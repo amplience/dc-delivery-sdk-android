@@ -10,8 +10,6 @@ on:
       - main
       - develop
       - ktlint
-      - run_tests
-      - update_tests
 
 jobs:
   Build:

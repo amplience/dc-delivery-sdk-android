@@ -13,6 +13,7 @@ abstract class AmplienceVideo {
      *
      * @param videoProfile
      */
+    @JvmOverloads
     fun getUrl(
         videoProfile: String = "mp4_720p"
     ): String = "https://${defaultHost}/v/${endpoint}/${name}/$videoProfile"
@@ -24,6 +25,7 @@ abstract class AmplienceVideo {
      * @param thumbName (optional) - the specific thumb frame
      *     e.g. https://cdn.media.amplience.net/v/ampproduct/ski-collection/thumbs/frame_0020.png
      */
+    @JvmOverloads
     fun getThumbnailUrl(
         builder: ImageUrlBuilder.() -> Unit = {},
         thumbName: String? = null

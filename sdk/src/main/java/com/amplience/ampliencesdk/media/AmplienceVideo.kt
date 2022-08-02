@@ -15,7 +15,7 @@ abstract class AmplienceVideo {
      */
     fun getUrl(
         videoProfile: String = "mp4_720p"
-    ): String = "https://${defaultHost}/v/${endpoint}/${name}/$videoProfile"
+    ): String = "https://$defaultHost/v/$endpoint/$name/$videoProfile"
 
     /**
      * [getThumbnailUrl] returns a url that can be used with any image loading libraries
@@ -28,7 +28,7 @@ abstract class AmplienceVideo {
         builder: ImageUrlBuilder.() -> Unit = {},
         thumbName: String? = null
     ): String {
-        var string = "https://${defaultHost}/v/${endpoint}/${name}"
+        var string = "https://$defaultHost/v/$endpoint/$name"
         if (thumbName != null) string += "/thumbs/$thumbName"
         string += ImageUrlBuilder().apply(builder).build()
         return string

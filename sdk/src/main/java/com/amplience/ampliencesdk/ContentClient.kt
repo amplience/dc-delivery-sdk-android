@@ -16,8 +16,9 @@ class ContentClient private constructor(
     private val configuration: Configuration = Configuration()
 ) {
 
-    data class Configuration(
-        val freshApiKey: String? = null
+    data class Configuration @JvmOverloads constructor(
+        val freshApiKey: String? = null,
+        val otherVar: String? = null
     )
 
     companion object {
@@ -28,6 +29,7 @@ class ContentClient private constructor(
          * Get the current instance of the [ContentClient].
          * Throws a [NotInitialisedException] if called before [initialise]
          */
+        @JvmStatic
         fun getInstance(): ContentClient = sdkManager ?: throw NotInitialisedException()
 
         /**
@@ -41,6 +43,8 @@ class ContentClient private constructor(
          *
          * @return [ContentClient]
          */
+        @JvmStatic
+        @JvmOverloads
         fun newInstance(
             context: Context,
             hub: String,
@@ -57,6 +61,8 @@ class ContentClient private constructor(
          * Creates an instance of the [ContentClient] which
          * can be subsequently called with [getInstance]
          */
+        @JvmStatic
+        @JvmOverloads
         fun initialise(
             context: Context,
             hub: String,
@@ -233,12 +239,13 @@ class ContentClient private constructor(
      * @param page (optional) - pagination
      * @param locale (optional) - to override default locale
      */
+    @JvmOverloads
     fun filterContent(
         vararg filters: FilterBy,
-        callback: ContentCallback<FilterContentResponse?>,
         sortBy: SortBy? = null,
         page: FilterContentRequest.Page? = null,
-        locale: String? = null
+        locale: String? = null,
+        callback: ContentCallback<FilterContentResponse?>
     ) {
         val filterRequest = FilterContentRequest(
             filterBy = filters.toList(),
@@ -305,8 +312,8 @@ class ContentClient private constructor(
      */
     fun listContent(
         vararg requests: Request,
-        callback: ContentCallback<List<ListContentResponse>?>,
-        locale: String? = null
+        locale: String? = null,
+        callback: ContentCallback<List<ListContentResponse>?>
     ) {
         val call = api.getMultipleContentAsync(
             ListContentRequest(
@@ -372,8 +379,8 @@ class ContentClient private constructor(
      */
     fun listContentById(
         vararg ids: String,
-        callback: ContentCallback<List<ListContentResponse>?>,
-        locale: String? = null
+        locale: String? = null,
+        callback: ContentCallback<List<ListContentResponse>?>
     ) {
         val call = api.getMultipleContentAsync(
             ListContentRequest(
@@ -440,8 +447,8 @@ class ContentClient private constructor(
      */
     fun listContentByKey(
         vararg keys: String,
-        callback: ContentCallback<List<ListContentResponse>?>,
-        locale: String? = null
+        locale: String? = null,
+        callback: ContentCallback<List<ListContentResponse>?>
     ) {
         val call = api.getMultipleContentAsync(
             ListContentRequest(

@@ -1,9 +1,9 @@
 package com.amplience.ampliencesdk.api
 
-import com.amplience.ampliencesdk.api.models.ListContentRequest
-import com.amplience.ampliencesdk.api.models.ListContentResponse
 import com.amplience.ampliencesdk.api.models.FilterContentRequest
 import com.amplience.ampliencesdk.api.models.FilterContentResponse
+import com.amplience.ampliencesdk.api.models.ListContentRequest
+import com.amplience.ampliencesdk.api.models.ListContentResponse
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body

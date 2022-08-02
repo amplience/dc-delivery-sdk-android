@@ -10,10 +10,15 @@ import com.amplience.ampliencesdk.api.models.FilterBy
 import com.amplience.ampliencesdk.api.models.SortBy
 import com.amplience.ampliencesdk.parseToObject
 import com.amplience.ampliencesdk.parseToObjectList
-import com.amplience.sampleapp.model.*
+import com.amplience.sampleapp.model.Banner
+import com.amplience.sampleapp.model.BlogPost
+import com.amplience.sampleapp.model.ImageSlide
+import com.amplience.sampleapp.model.Screen
+import com.amplience.sampleapp.model.Slide
+import com.amplience.sampleapp.model.Text
+import com.amplience.sampleapp.model.Video
 import kotlinx.coroutines.launch
 import timber.log.Timber
-
 
 class MainViewModel : ViewModel() {
 

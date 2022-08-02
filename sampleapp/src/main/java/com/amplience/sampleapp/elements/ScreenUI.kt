@@ -32,10 +32,12 @@ fun ScreenUI(
     }
     when (screen) {
         is Screen.HomeScreen -> {
-            Home(viewModel.screens.filter {
-                // Don't add home screen to the button list
-                it !is Screen.HomeScreen
-            }) {
+            Home(
+                viewModel.screens.filter {
+                    // Don't add home screen to the button list
+                    it !is Screen.HomeScreen
+                }
+            ) {
                 navController.navigate(it.id)
             }
         }
@@ -90,7 +92,12 @@ fun ScreenUI(
                 }
                 if (screen.video != null) item {
                     Timber.d("Screen.video ${screen.video}")
-                    VideoUI(video = screen.video, modifier = Modifier.fillMaxWidth().aspectRatio(1.5f))
+                    VideoUI(
+                        video = screen.video,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1.5f)
+                    )
                 }
             }
         }

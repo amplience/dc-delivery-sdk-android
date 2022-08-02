@@ -5,7 +5,13 @@ import android.util.Log
 import com.amplience.ampliencesdk.api.Api
 import com.amplience.ampliencesdk.api.ContentCallback
 import com.amplience.ampliencesdk.api.RetrofitClient
-import com.amplience.ampliencesdk.api.models.*
+import com.amplience.ampliencesdk.api.models.FilterBy
+import com.amplience.ampliencesdk.api.models.FilterContentRequest
+import com.amplience.ampliencesdk.api.models.FilterContentResponse
+import com.amplience.ampliencesdk.api.models.ListContentRequest
+import com.amplience.ampliencesdk.api.models.ListContentResponse
+import com.amplience.ampliencesdk.api.models.Request
+import com.amplience.ampliencesdk.api.models.SortBy
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

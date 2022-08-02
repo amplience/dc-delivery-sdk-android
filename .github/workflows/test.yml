@@ -23,6 +23,9 @@ jobs:
         ruby-version: 2.6.x
     - name: Bundle install
       run: gem install bundler && bundle install
+    - name: Run ktlint
+      run: bundle exec fastlane lint
+      timeout-minutes: 20
     - name: Run tests
       run: bundle exec fastlane test
       timeout-minutes: 20

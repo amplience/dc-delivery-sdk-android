@@ -1,5 +1,13 @@
 package com.amplience.ampliencesdk
 
+import com.amplience.ampliencesdk.api.models.images.ColorSpace
+import com.amplience.ampliencesdk.api.models.images.CompositeMode
+import com.amplience.ampliencesdk.api.models.images.ContentFormat
+import com.amplience.ampliencesdk.api.models.images.DpiFilter
+import com.amplience.ampliencesdk.api.models.images.ResizeAlgorithm
+import com.amplience.ampliencesdk.api.models.images.ScaleMode
+import com.amplience.ampliencesdk.api.models.images.Unsharp
+import com.amplience.ampliencesdk.api.models.images.Upscale
 import com.amplience.ampliencesdk.media.AmplienceImage
 import org.junit.Assert.assertEquals
 import org.junit.Test

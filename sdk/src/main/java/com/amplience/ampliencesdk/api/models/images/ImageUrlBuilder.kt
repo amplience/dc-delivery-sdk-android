@@ -297,32 +297,29 @@ class ImageUrlBuilder {
             crop!!.w,
             crop!!.h
         )
-        if (edgeCrop != null)
-            addQuery(
-                "ecrop",
-                edgeCrop!!.left,
-                edgeCrop!!.top,
-                edgeCrop!!.right,
-                edgeCrop!!.bottom
-            )
+        if (edgeCrop != null) addQuery(
+            "ecrop",
+            edgeCrop!!.left,
+            edgeCrop!!.top,
+            edgeCrop!!.right,
+            edgeCrop!!.bottom
+        )
 
-        if (preCrop != null)
-            addQuery(
-                "pcrop",
-                preCrop!!.x,
-                preCrop!!.y,
-                preCrop!!.w,
-                preCrop!!.h
-            )
+        if (preCrop != null) addQuery(
+            "pcrop",
+            preCrop!!.x,
+            preCrop!!.y,
+            preCrop!!.w,
+            preCrop!!.h
+        )
 
-        if (preEdgeCrop != null)
-            addQuery(
-                "pecrop",
-                preEdgeCrop!!.left,
-                preEdgeCrop!!.top,
-                preEdgeCrop!!.right,
-                preEdgeCrop!!.bottom
-            )
+        if (preEdgeCrop != null) addQuery(
+            "pecrop",
+            preEdgeCrop!!.left,
+            preEdgeCrop!!.top,
+            preEdgeCrop!!.right,
+            preEdgeCrop!!.bottom
+        )
 
         if (rotateDegrees != null) {
             if (preRotate == true) {
@@ -349,22 +346,20 @@ class ImageUrlBuilder {
         if (strip) addQuery("strip", true)
         if (!chromaSubsampling) addQuery("fmt.jpeg.chroma", 1, 1, 1)
         if (colorSpace != null) addQuery("cs", colorSpace!!)
-        if (unsharp != null)
-            addQuery(
-                "unsharp",
-                unsharp!!.radius,
-                unsharp!!.sigma,
-                unsharp!!.amount,
-                unsharp!!.threshold
-            )
+        if (unsharp != null) addQuery(
+            "unsharp",
+            unsharp!!.radius,
+            unsharp!!.sigma,
+            unsharp!!.amount,
+            unsharp!!.threshold
+        )
 
         if (compositeMode != null) addQuery("cm", compositeMode!!)
-        if (backgroundRgb != null)
-            addQuery(
-                "bg",
-                "rgb(${backgroundRgb!!.first},${backgroundRgb!!.second},${backgroundRgb!!.third})",
-                preEncoded = true
-            )
+        if (backgroundRgb != null) addQuery(
+            "bg",
+            "rgb(${backgroundRgb!!.first},${backgroundRgb!!.second},${backgroundRgb!!.third})",
+            preEncoded = true
+        )
 
         if (indexed) {
             addQuery("fmt.png.indexed", true)

@@ -362,31 +362,114 @@ class ImageUrlBuilder {
      * @param colorSpace
      */
     fun colorSpace(colorSpace: ColorSpace) = apply { this.colorSpace = colorSpace }
-    fun unsharp(unsharp: Unsharp) = apply { this.unsharp = unsharp }
+
+    /**
+     * [ImageUrlBuilder.sharpen]
+     * Sharpens the image with an unsharp mask.
+     * @see [Unsharp] for parameter values
+     *
+     * @param unsharp
+     */
+    fun sharpen(unsharp: Unsharp) = apply { this.unsharp = unsharp }
+
+    /**
+     * [ImageUrlBuilder.compositeMode]
+     * When an image is applied on top of a background colour this defines the composite operator.
+     * @see [CompositeMode] for parameter values
+     *
+     * @param compositeMode
+     */
     fun compositeMode(compositeMode: CompositeMode) = apply { this.compositeMode = compositeMode }
+
+    /**
+     * [ImageUrlBuilder.background]
+     * This will set the background colour of the image. It only has an effect when the image is padded or the original image is transparent.
+     *
+     * @param red the red value of the rgb 0-255
+     * @param green the green value of the rgb 0-255
+     * @param blue the blue value of the rgb 0-255
+     */
     fun background(red: Int, green: Int, blue: Int) = apply {
         backgroundRgb = Triple(red, green, blue)
     }
 
     /**
+     * [ImageUrlBuilder.index]
      * Specify if the PNG image should be indexed. Indexed PNGs have a color palette rather than
      * storing color information with the pixel data.
+     *
+     * @param indexed true or false
+     * @param paletteSize (optional) - Sets the color palette size for a png image. The value must be between 1 and 256. Requires [indexed] to be true
+     * The default palette size is 256. Note the image has to be served in png format. Should notably reduce the filesize of an asset.
      */
     fun index(indexed: Boolean, paletteSize: Int? = null) = apply {
         this.indexed = indexed
         this.paletteSize = paletteSize
     }
 
+    /**
+     * [ImageUrlBuilder.dither]
+     * Dither = false disables dithering. Dithering helps smooth out the colour banding when dealing with a reduced colour palette. Dithering may increase filesize due to increased difficulty when compressing.
+     *
+     * @param dithered true or false (true by default)
+     */
     fun dither(dithered: Boolean) = apply { this.dithered = dithered }
+
+    /**
+     * [ImageUrlBuilder.blur]
+     * Applies a Gaussian blur to the image.
+     *
+     * @param radius the accuracy of the blur. Should generally be 2 to 3 times sigma
+     * @param sigma the strength of the blur. Both radius and sigma are between 0 to
+     */
     fun blur(radius: Int, sigma: Int) = apply { blur = Blur(radius, sigma) }
+
+    /**
+     * [ImageUrlBuilder.reduceNoise]
+     * Removes noise from an image. The value is between 0 and 5. The higher the value the more noise is removed.
+     *
+     * @param reduceNoise 0 - 5
+     */
     fun reduceNoise(reduceNoise: Int) = apply { this.reduceNoise = reduceNoise }
+
+    /**
+     * [ImageUrlBuilder.gamma]
+     * Adjusts the gamma correction of an image. gamma is specified as a floating point value. A value of less than 1 will make the image darker and greater than 1 will make the image lighter.
+     *
+     * @param gamma
+     */
     fun gamma(gamma: Float) = apply { this.gamma = gamma }
+
+    /**
+     * [ImageUrlBuilder.hsb]
+     * Hue, saturation, brightness. Each of these parameters can be specified separately. Each value is between -100 to 100.
+     *
+     * @param hue - adjust the color of the image. The color change is based on the hue scale
+     * @param saturation - adjust the amount of gray in the image
+     * @param brightness - adjust the brightness of the image.
+     */
     fun hsb(hue: Int, saturation: Int, brightness: Int) = apply {
         this.hue = hue
         this.saturation = saturation
         this.brightness = brightness
     }
 
+    /**
+     * [ImageUrlBuilder.addImageLayer]
+     * Add an image layer on top of your image
+     *
+     * @param src - The URL for the image in the specified layer. If you start the image URL with "/i//" then it will use the same partial domain as layer0 or the template you specified at the start of the URL
+     * @param width - width in pixels
+     * @param height - height in pixels
+     * @param topPx - pixel offset from the top of your base image. Use [topPx] OR [topPercent]
+     * @param topPercent - percentage offset from the top of your base image (0 - 100). Use [topPx] OR [topPercent]
+     * @param leftPx - pixel offset from the left. Use [leftPx] OR [leftPercent]
+     * @param leftPercent - percentage offset from the left 0 - 100. Use [leftPx] OR [leftPercent]
+     * @param bottomPx - pixel offset from the bottom. Use [bottomPx] OR [bottomPercent]
+     * @param bottomPercent - percentage offset from the bottom 0 - 100. Use [bottomPx] OR [bottomPercent]
+     * @param rightPx - pixel offset from the right. Use [rightPx] OR [rightPercent]
+     * @param rightPercent - percentage offset from the right 0 - 100. Use [rightPx] OR [rightPercent]
+     */
     fun addImageLayer(
         src: String,
         width: Int? = null,
@@ -421,10 +504,24 @@ class ImageUrlBuilder {
         )
     }
 
+    /**
+     * [ImageUrlBuilder.addTextLayer]
+     * Add a text layer on top of your image
+     *
+     * @param text - The text to show in the layer. You can add a new line character by including by including \n in the string
+     * @param fontSize - The font size to use for the text. If no font size is specified it will default to 10
+     * @param fontFamily - The font family to use for the text. If you don't specify a font family, or specify a font that is not installed on your account, then it will default to Helevetica
+     * @param fontStyle - Which style of font to use: [TextLayer.FontStyle.Normal], [TextLayer.FontStyle.Italic] or [TextLayer.FontStyle.Oblique]. Font style selection follows CSS rules
+     * @param fontWeight - Sets the thickness of the text. Valid values are from 100 to 900 in multiples of 100
+     * @param fontStretch - Makes text wider or narrower if the font family has appropriate variants. Font selection will follow the CSS rules. See [TextLayer.FontStretch] for options
+     * @param textColor - The color of the text. If no color is specified the text will be black. Values can be [TextLayer.TextColor.Hex], [TextLayer.TextColor.RGB] or [TextLayer.TextColor.ColorName]
+     * @param textDecoration - The decoration added to the text. Supported values are [TextLayer.Decoration.Underline], [TextLayer.Decoration.Overline], [TextLayer.Decoration.LineThrough]
+     * @param textAlign - How the text is aligned within its layer. If no alignment is specified the text will be default to left aligned. Alignment will be used when text is divided over more than one line by using the newline "\n" character.
+     */
     fun addTextLayer(
         text: String,
-        fontSize: Int? = null, // defaults to 10
-        fontFamily: String? = null, // If you don't specify a font family, or specify a font that is not installed on your account, then it will default to Helevetica.
+        fontSize: Int? = null,
+        fontFamily: String? = null,
         fontStyle: TextLayer.FontStyle? = null,
         fontWeight: Int? = null, // Valid values are from 100 to 900 in multiples of 100.
         fontStretch: TextLayer.FontStretch? = null,
@@ -447,7 +544,7 @@ class ImageUrlBuilder {
         )
     }
 
-    fun build(): String {
+    internal fun build(): String {
         val builder = StringBuilder()
         var firstQuery = true
 

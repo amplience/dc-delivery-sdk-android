@@ -569,7 +569,7 @@ class ImageUrlUnitTest {
         assertEquals(
             "https://cdn.media.amplience.net/i/ampproduct/test-image?unsharp=3,0.05,150,100",
             testImage.getUrl {
-                unsharp(Unsharp(radius = 3, sigma = 0.05, amount = 150, threshold = 100))
+                sharpen(Unsharp(radius = 3, sigma = 0.05, amount = 150, threshold = 100))
             }
         )
     }

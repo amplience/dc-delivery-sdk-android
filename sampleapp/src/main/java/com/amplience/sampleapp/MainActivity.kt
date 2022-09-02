@@ -24,6 +24,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.amplience.ampliencesdk.ContentClient
 import com.amplience.sampleapp.elements.LoadingView
 import com.amplience.sampleapp.elements.ScreenUI
 import com.amplience.sampleapp.model.Screen
@@ -38,6 +39,16 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val extras = intent.extras
+        val stagingEnvironmentUrl = extras?.getString("stagingEnvironment")
+        if (stagingEnvironmentUrl != null) {
+            // Use stagingEnvironmentUrl instead of production api
+            ContentClient.initialise(applicationContext, stagingEnvironmentUrl)
+        } else {
+            ContentClient.initialise(applicationContext, "ampproduct-doc")
+        }
+
         setContent {
             SampleAppTheme {
                 Surface(

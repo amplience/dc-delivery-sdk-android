@@ -43,16 +43,69 @@ class ImageUrlBuilder {
     private var brightness: Int? = null
     private var layers: ArrayList<Layer> = ArrayList()
 
+    /**
+     * [ImageUrlBuilder.width]
+     * Sets the width of the image. If you only provide the width, the height will be calculated to maintain the aspect ratio.
+     *
+     * @param width in pixels
+     */
     fun width(width: Int) = apply { this.width = width }
+
+    /**
+     * [ImageUrlBuilder.height]
+     * Sets the height of the image. If you only provide the height, the width will be calculated to maintain the aspect ratio.
+     *
+     * @param height in pixels
+     */
     fun height(height: Int) = apply { this.height = height }
+
+    /**
+     * [ImageUrlBuilder.maxWidth]
+     * Sets the maximum width for the image returned. Can be specified at the account level
+     *
+     * @param maxWidth in pixels
+     */
     fun maxWidth(maxWidth: Int) = apply { this.maxWidth = maxWidth }
+
+    /**
+     * [ImageUrlBuilder.maxHeight]
+     * Sets the maximum height for the image returned. Can be specified at the account level
+     *
+     * @param maxHeight in pixels
+     */
     fun maxHeight(maxHeight: Int) = apply { this.maxHeight = maxHeight }
+
+    /**
+     * [ImageUrlBuilder.quality]
+     * Sets the compression quality of the image, this is a percentage 0-100. JPEGs are lossy, PNGs are lossless but are compressed with zlib.
+     *
+     *  @param quality percent 0 - 100
+     */
     fun quality(quality: Int) = apply { this.quality = quality }
+
+    /**
+     * [ImageUrlBuilder.defaultQuality]
+     * Specifies that the default quality should be used for the following formats: webp,jp2,jpeg or png. Can be used with fmt=auto or on its own. See auto format for more details.
+     * The default settings for each format are:
+     *     - jp2 40
+     *     - webp 80
+     *     - jpeg 75
+     *     - png 90
+     *
+     * You can add your own quality settings in the root template for your account or transformation templates.
+     */
     fun defaultQuality() = apply {
         this.defaultQuality = true
         quality = null
     }
 
+    /**
+     * [ImageUrlBuilder.scaleMode]
+     * Indicates how to position the image if it does not fit exactly to the width and height specified.
+     * @see [ScaleMode] for options
+     *
+     * @param scaleMode
+     */
     fun scaleMode(scaleMode: ScaleMode) = apply {
         this.scaleMode = scaleMode
         if (scaleMode is ScaleMode.Clamp) {
@@ -61,14 +114,55 @@ class ImageUrlBuilder {
         }
     }
 
+    /**
+     * [ImageUrlBuilder.scaleFit]
+     * Specifies how to position the area to be cropped when using sm.
+     *     - center (default)
+     *     - poi - Crop using the specified point of interest focal point
+     * @see [ScaleFit] for more detail
+     *
+     * @param scaleFit
+     */
     fun scaleFit(scaleFit: ScaleFit) = apply { this.scaleFit = scaleFit }
+
+    /**
+     * [ImageUrlBuilder.resize]
+     * The algorithm to use when the image is resized.
+     * @see [ResizeAlgorithm] for more details
+     *
+     * @param resizeAlgorithm
+     */
     fun resize(resizeAlgorithm: ResizeAlgorithm) = apply { this.resizeAlgorithm = resizeAlgorithm }
+
+    /**
+     * [ImageUrlBuilder.upscale]
+     * [Upscale.True] / [Upscale.False] / [Upscale.Padd]
+     * Indicates if the system can scale the image to be bigger than the original input.
+     * If set to [Upscale.Padd] the image will be drawn on top of a canvas with the size given.
+     * The alignment of the image is set using [scaleMode].
+     * The background colour of the canvas is set using [backgroundRgb].
+     * @see [Upscale] for more details
+     *
+     * @param upscale
+     */
     fun upscale(upscale: Upscale) = apply { this.upscale = upscale }
 
     /**
+     * [ImageUrlBuilder.format]
+     * Sets the format of the image, if this is not specified the format will be the same as the original.
+     * Supported formats include:
+     *   - [ContentFormat.Jpeg]
+     *   - [ContentFormat.Png]
+     *   - [ContentFormat.Gif]
+     *   - [ContentFormat.Bmp]
+     *   - [ContentFormat.Webp]
+     *   - [ContentFormat.Jp2]
+     * Note that webp is not supported on certain browsers. jp2 is currently only supported in Safari for iOS and macOS.
+     *
      * @param format - choose from 6 [ContentFormat]s
      * @param quality - select a quality percentage 0-100 (does not apply to [ContentFormat.Gif] or [ContentFormat.Bmp])
      */
+    @JvmOverloads
     fun format(format: ContentFormat, quality: Int? = null) = apply {
         this.format = format
         formatQuality = when (format) {
@@ -80,6 +174,16 @@ class ImageUrlBuilder {
         }
     }
 
+    /**
+     * [ImageUrlBuilder.crop]
+     * Cuts out a section of the image, the coordinates are specified as x, y, w, h.
+     * This command is applied after any resize so the coordinates are relative to the resized image.
+     *
+     * @param x - the offset from the top left of the image
+     * @param y - the offset from the top of the image
+     * @param w - the width of the selection
+     * @param h - the height of the selection
+     */
     fun crop(
         x: Int, // offset from the top left of the image
         y: Int, // offset from the top of the image
@@ -89,6 +193,15 @@ class ImageUrlBuilder {
         crop = Crop(x, y, w, h)
     }
 
+    /**
+     * [ImageUrlBuilder.edgeCrop]
+     * Takes 4 parameters: left, top, right, bottom to crop from each edge of the image.
+     *
+     * @param left - pixels cropped from left of image
+     * @param top - pixels cropped from top of image
+     * @param right - pixels cropped from right of image
+     * @param bottom - pixels cropped from bottom of image
+     */
     fun edgeCrop(
         left: Int,
         top: Int,
@@ -98,15 +211,35 @@ class ImageUrlBuilder {
         edgeCrop = EdgeCrop(left, top, right, bottom)
     }
 
+    /**
+     * [ImageUrlBuilder.preCrop]
+     *
+     * Same as [ImageUrlBuilder.crop] except it does the crop before any resize event.
+     * Therefore the coordinates are relative to the original image size.
+     *
+     * @param x - offset from the top left of the image
+     * @param y - offset from the top of the image
+     * @param w - width of the selection
+     * @param h - height of the selection
+     */
     fun preCrop(
-        x: Int, // offset from the top left of the image
-        y: Int, // offset from the top of the image
-        w: Int, // width of the selection
-        h: Int // height of the selection)
+        x: Int,
+        y: Int,
+        w: Int,
+        h: Int
     ) = apply {
         preCrop = Crop(x, y, w, h)
     }
 
+    /**
+     * [ImageUrlBuilder.preEdgeCrop]
+     * Same as [ImageUrlBuilder.edgeCrop] but crops from the edge of the image before any resize event.
+     *
+     * @param left - pixels cropped from left of image
+     * @param top - pixels cropped from top of image
+     * @param right - pixels cropped from right of image
+     * @param bottom - pixels cropped from bottom of image
+     */
     fun preEdgeCrop(
         left: Int,
         top: Int,
@@ -116,67 +249,227 @@ class ImageUrlBuilder {
         preEdgeCrop = EdgeCrop(left, top, right, bottom)
     }
 
+    /**
+     * [ImageUrlBuilder.rotate]
+     * Rotate an image by a specified number of degrees. The rotate is applied after the effect of any resize parameters.
+     *
+     * @param angle
+     */
     fun rotate(angle: Int) {
         rotateDegrees = angle
         preRotate = false
     }
 
+    /**
+     * [ImageUrlBuilder.rotate]
+     * Rotate an image by a specified number of degrees. The rotate is applied after the effect of any resize parameters.
+     *
+     * Rotating by an angle that is not a multiple of 90 degrees will expose some pixels underneath the image. You can specify a color for the exposed pixels by specifying an r, g and b value
+     *
+     * @param angle
+     * @param r - the red value in the background RGB
+     * @param g - the green value in the background RGB
+     * @param b - the blue value in the background RGB
+     */
     fun rotate(angle: Int, r: Int, g: Int, b: Int) {
         rotateDegrees = angle
         rgb = Triple(r, g, b)
         preRotate = false
     }
 
+    /**
+     * [ImageUrlBuilder.preRotate]
+     * The same as [ImageUrlBuilder.rotate], except that the rotation is applied before any resize parameters.
+     *
+     * @param angle
+     */
     fun preRotate(angle: Int) {
         rotateDegrees = angle
         preRotate = true
     }
 
+    /**
+     * [ImageUrlBuilder.preRotate]
+     * The same as [ImageUrlBuilder.rotate], except that the rotation is applied before any resize parameters.
+     *
+     * Rotating by an angle that is not a multiple of 90 degrees will expose some pixels underneath the image. You can specify a color for the exposed pixels by specifying an r, g and b valu
+     *
+     * @param angle
+     * @param r - the red value in the background RGB
+     * @param g - the green value in the background RGB
+     * @param b - the blue value in the background RGB
+     */
     fun preRotate(angle: Int, r: Int, g: Int, b: Int) {
         rotateDegrees = angle
         rgb = Triple(r, g, b)
         preRotate = true
     }
 
+    /**
+     * [ImageUrlBuilder.flipHorizontally]
+     * Flips the image horizontally
+     */
     fun flipHorizontally() = apply { flipH = true }
+
+    /**
+     * [ImageUrlBuilder.flipVertically]
+     * Flips the image vertically
+     */
     fun flipVertically() = apply { flipV = true }
 
+    /**
+     * [ImageUrlBuilder.dpi]
+     * Changes the image resolution. If this param is not specified the image will be returned in the DPI it was originally created in.
+     *
+     * Optionally specify the resampling algorithm to use when changing the DPI.
+     *   - [DpiFilter.Quadratic]
+     *   - [DpiFilter.Sinc]
+     *   - [DpiFilter.Lanczos] (default)
+     *   - [DpiFilter.Point]
+     *   - [DpiFilter.Cubic]
+     *
+     * @param dpi - dots per inch
+     * @param dpiFilter (optional) - [DpiFilter]
+     */
+    @JvmOverloads
     fun dpi(dpi: Int, dpiFilter: DpiFilter? = null) = apply {
         this.dpi = dpi
         this.dpiFilter = dpiFilter
     }
 
+    /**
+     * [ImageUrlBuilder.strip]
+     * Removes commands and meta data from the image.
+     */
     fun strip() = apply { strip = true }
 
+    /**
+     * [ImageUrlBuilder.chromaSubsampling]
+     * Chroma subsampling is a process which bases image sampling on brightness rather than colour to take advantage of how the human eye works. Generally this affects colours and contrasts such as red and black.
+     * Dynamic Media has Chroma Subsampling turned on by default to enhance performance and lower file size media. Use this method to turn it off.
+     * Note that turning this off will result in your media being served at a larger file size, so you may wish to adjust the quality setting to compensate
+     *
+     * @param chromaSubsampling - turn subsampling on or off
+     */
     fun chromaSubsampling(chromaSubsampling: Boolean) =
         apply { this.chromaSubsampling = chromaSubsampling }
 
+    /**
+     * [ImageUrlBuilder.colorSpace]
+     * Changes the colorspace used for the image.
+     * @see [ColorSpace] for supported values
+     *
+     * @param colorSpace
+     */
     fun colorSpace(colorSpace: ColorSpace) = apply { this.colorSpace = colorSpace }
-    fun unsharp(unsharp: Unsharp) = apply { this.unsharp = unsharp }
+
+    /**
+     * [ImageUrlBuilder.sharpen]
+     * Sharpens the image with an unsharp mask.
+     * @see [Unsharp] for parameter values
+     *
+     * @param unsharp
+     */
+    fun sharpen(unsharp: Unsharp) = apply { this.unsharp = unsharp }
+
+    /**
+     * [ImageUrlBuilder.compositeMode]
+     * When an image is applied on top of a background colour this defines the composite operator.
+     * @see [CompositeMode] for parameter values
+     *
+     * @param compositeMode
+     */
     fun compositeMode(compositeMode: CompositeMode) = apply { this.compositeMode = compositeMode }
+
+    /**
+     * [ImageUrlBuilder.background]
+     * This will set the background colour of the image. It only has an effect when the image is padded or the original image is transparent.
+     *
+     * @param red the red value of the rgb 0-255
+     * @param green the green value of the rgb 0-255
+     * @param blue the blue value of the rgb 0-255
+     */
     fun background(red: Int, green: Int, blue: Int) = apply {
         backgroundRgb = Triple(red, green, blue)
     }
 
     /**
+     * [ImageUrlBuilder.index]
      * Specify if the PNG image should be indexed. Indexed PNGs have a color palette rather than
      * storing color information with the pixel data.
+     *
+     * @param indexed true or false
+     * @param paletteSize (optional) - Sets the color palette size for a png image. The value must be between 1 and 256. Requires [indexed] to be true
+     * The default palette size is 256. Note the image has to be served in png format. Should notably reduce the filesize of an asset.
      */
     fun index(indexed: Boolean, paletteSize: Int? = null) = apply {
         this.indexed = indexed
         this.paletteSize = paletteSize
     }
 
+    /**
+     * [ImageUrlBuilder.dither]
+     * Dither = false disables dithering. Dithering helps smooth out the colour banding when dealing with a reduced colour palette. Dithering may increase filesize due to increased difficulty when compressing.
+     *
+     * @param dithered true or false (true by default)
+     */
     fun dither(dithered: Boolean) = apply { this.dithered = dithered }
+
+    /**
+     * [ImageUrlBuilder.blur]
+     * Applies a Gaussian blur to the image.
+     *
+     * @param radius the accuracy of the blur. Should generally be 2 to 3 times sigma
+     * @param sigma the strength of the blur. Both radius and sigma are between 0 to
+     */
     fun blur(radius: Int, sigma: Int) = apply { blur = Blur(radius, sigma) }
+
+    /**
+     * [ImageUrlBuilder.reduceNoise]
+     * Removes noise from an image. The value is between 0 and 5. The higher the value the more noise is removed.
+     *
+     * @param reduceNoise 0 - 5
+     */
     fun reduceNoise(reduceNoise: Int) = apply { this.reduceNoise = reduceNoise }
+
+    /**
+     * [ImageUrlBuilder.gamma]
+     * Adjusts the gamma correction of an image. gamma is specified as a floating point value. A value of less than 1 will make the image darker and greater than 1 will make the image lighter.
+     *
+     * @param gamma
+     */
     fun gamma(gamma: Float) = apply { this.gamma = gamma }
+
+    /**
+     * [ImageUrlBuilder.hsb]
+     * Hue, saturation, brightness. Each of these parameters can be specified separately. Each value is between -100 to 100.
+     *
+     * @param hue - adjust the color of the image. The color change is based on the hue scale
+     * @param saturation - adjust the amount of gray in the image
+     * @param brightness - adjust the brightness of the image.
+     */
     fun hsb(hue: Int, saturation: Int, brightness: Int) = apply {
         this.hue = hue
         this.saturation = saturation
         this.brightness = brightness
     }
 
+    /**
+     * [ImageUrlBuilder.addImageLayer]
+     * Add an image layer on top of your image
+     *
+     * @param src - The URL for the image in the specified layer. If you start the image URL with "/i//" then it will use the same partial domain as layer0 or the template you specified at the start of the URL
+     * @param width - width in pixels
+     * @param height - height in pixels
+     * @param topPx - pixel offset from the top of your base image. Use [topPx] OR [topPercent]
+     * @param topPercent - percentage offset from the top of your base image (0 - 100). Use [topPx] OR [topPercent]
+     * @param leftPx - pixel offset from the left. Use [leftPx] OR [leftPercent]
+     * @param leftPercent - percentage offset from the left 0 - 100. Use [leftPx] OR [leftPercent]
+     * @param bottomPx - pixel offset from the bottom. Use [bottomPx] OR [bottomPercent]
+     * @param bottomPercent - percentage offset from the bottom 0 - 100. Use [bottomPx] OR [bottomPercent]
+     * @param rightPx - pixel offset from the right. Use [rightPx] OR [rightPercent]
+     * @param rightPercent - percentage offset from the right 0 - 100. Use [rightPx] OR [rightPercent]
+     */
     fun addImageLayer(
         src: String,
         width: Int? = null,
@@ -211,10 +504,24 @@ class ImageUrlBuilder {
         )
     }
 
+    /**
+     * [ImageUrlBuilder.addTextLayer]
+     * Add a text layer on top of your image
+     *
+     * @param text - The text to show in the layer. You can add a new line character by including by including \n in the string
+     * @param fontSize - The font size to use for the text. If no font size is specified it will default to 10
+     * @param fontFamily - The font family to use for the text. If you don't specify a font family, or specify a font that is not installed on your account, then it will default to Helevetica
+     * @param fontStyle - Which style of font to use: [TextLayer.FontStyle.Normal], [TextLayer.FontStyle.Italic] or [TextLayer.FontStyle.Oblique]. Font style selection follows CSS rules
+     * @param fontWeight - Sets the thickness of the text. Valid values are from 100 to 900 in multiples of 100
+     * @param fontStretch - Makes text wider or narrower if the font family has appropriate variants. Font selection will follow the CSS rules. See [TextLayer.FontStretch] for options
+     * @param textColor - The color of the text. If no color is specified the text will be black. Values can be [TextLayer.TextColor.Hex], [TextLayer.TextColor.RGB] or [TextLayer.TextColor.ColorName]
+     * @param textDecoration - The decoration added to the text. Supported values are [TextLayer.Decoration.Underline], [TextLayer.Decoration.Overline], [TextLayer.Decoration.LineThrough]
+     * @param textAlign - How the text is aligned within its layer. If no alignment is specified the text will be default to left aligned. Alignment will be used when text is divided over more than one line by using the newline "\n" character.
+     */
     fun addTextLayer(
         text: String,
-        fontSize: Int? = null, // defaults to 10
-        fontFamily: String? = null, // If you don't specify a font family, or specify a font that is not installed on your account, then it will default to Helevetica.
+        fontSize: Int? = null,
+        fontFamily: String? = null,
         fontStyle: TextLayer.FontStyle? = null,
         fontWeight: Int? = null, // Valid values are from 100 to 900 in multiples of 100.
         fontStretch: TextLayer.FontStretch? = null,
@@ -237,7 +544,7 @@ class ImageUrlBuilder {
         )
     }
 
-    fun build(): String {
+    internal fun build(): String {
         val builder = StringBuilder()
         var firstQuery = true
 

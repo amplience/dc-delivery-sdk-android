@@ -10,7 +10,6 @@ class SampleApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        ContentClient.initialise(applicationContext, "ampproduct-doc")
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }

@@ -1,6 +1,6 @@
 package com.amplience.sampleapp.model
 
-import com.amplience.ampliencesdk.media.AmplienceVideo
+import com.amplience.sdk.delivery.android.media.AmplienceVideo
 
 data class Video(
     override val id: String,

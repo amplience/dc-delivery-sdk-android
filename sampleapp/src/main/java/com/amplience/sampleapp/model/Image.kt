@@ -1,6 +1,6 @@
 package com.amplience.sampleapp.model
 
-import com.amplience.ampliencesdk.media.AmplienceImage
+import com.amplience.sdk.delivery.android.media.AmplienceImage
 
 data class Image(
     override val id: String,

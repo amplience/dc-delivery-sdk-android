@@ -1,8 +1,7 @@
 package com.amplience.sampleapp.app
 
 import android.app.Application
-import com.amplience.ampliencesdk.BuildConfig
-import com.amplience.ampliencesdk.ContentClient
+import com.amplience.sampleapp.BuildConfig
 import timber.log.Timber
 
 class SampleApplication : Application() {

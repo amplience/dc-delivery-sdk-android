@@ -16,7 +16,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import com.amplience.ampliencesdk.media.AmplienceVideo
+import com.amplience.sdk.delivery.android.media.AmplienceVideo
 import timber.log.Timber
 
 @Composable

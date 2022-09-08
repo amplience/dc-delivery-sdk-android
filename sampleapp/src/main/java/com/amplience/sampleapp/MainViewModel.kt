@@ -5,11 +5,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.amplience.ampliencesdk.ContentClient
-import com.amplience.ampliencesdk.api.models.FilterBy
-import com.amplience.ampliencesdk.api.models.SortBy
-import com.amplience.ampliencesdk.parseToObject
-import com.amplience.ampliencesdk.parseToObjectList
+import com.amplience.sdk.delivery.android.ContentClient
+import com.amplience.sdk.delivery.android.api.models.FilterBy
+import com.amplience.sdk.delivery.android.api.models.SortBy
+import com.amplience.sdk.delivery.android.parseToObject
+import com.amplience.sdk.delivery.android.parseToObjectList
 import com.amplience.sampleapp.model.Banner
 import com.amplience.sampleapp.model.BlogPost
 import com.amplience.sampleapp.model.ImageSlide

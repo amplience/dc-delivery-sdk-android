@@ -24,7 +24,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.amplience.ampliencesdk.ContentClient
+import com.amplience.sdk.delivery.android.ContentClient
 import com.amplience.sampleapp.elements.LoadingView
 import com.amplience.sampleapp.elements.ScreenUI
 import com.amplience.sampleapp.model.Screen

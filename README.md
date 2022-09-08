@@ -33,7 +33,8 @@ dependencies {
 Initialise the SDK:
 
 ```kotlin
-// The hub name can be found in your Amplience url https://[your-hub-name].cdn.content.amplience.net/
+// The hub name can be found in your delivery url: https://[your-hub-name].cdn.content.amplience.net/
+// It is also available in the "settings" menu in Dynamic Content.
 ContentClient.initialise(context = applicationContext, hub = "your-hub-name")
 ```
 
@@ -71,7 +72,7 @@ ContentClient.initialise(
 
 ### Get content by id
 
-These methods use [Kotlin Coroutines](https://developer.android.com/kotlin/coroutines) and should be called in a lifecycleScope. There are alternative methods that take a callback parameter if you are using Java, or are not using coroutines.
+These methods use [Kotlin Coroutines](https://developer.android.com/kotlin/coroutines) and should be called in `LifecycleScope`. There are alternative methods that take a callback parameter if you are using Java, or are not using coroutines.
 
 The `getContentById(id: String)` method returns a `Result<ListContentResponse>` which will resolve to the JSON of your slot or content item. If no content is found with the provided ID then the `result.isSuccess` will be false, and the error can be retrieved with `.exceptionOrNull()`.
 
@@ -110,11 +111,7 @@ The format of the content object will be specific to your content types, which d
 
 ### Filtering Content Items
 
-#### One filter
-
 Content can be filtered and sorted using the `filterContent()` method.
-
-This method accepts any number of `FilterBy`-type filters in a logical AND chaining (in Java this would be passed as a FilterBy array). The model also allows for an optional `sortBy` which allows for sorting by `ASC` or `DSC` and an optional `page` key of `Page` class instance. The `Page` class allows for `size` and `cursor` to be specified to enable pagination.
 
 ```kotlin
 val filterableRes = ContentClient.getInstance().filterContent(
@@ -128,6 +125,8 @@ if (filterableRes.isSuccess) {
 }
 ```
 
+This method accepts any number of `FilterBy`-type filters in a logical AND chaining (in Java this would be passed as a FilterBy array).
+
 ```kotlin
 ContentClient.getInstance().filterContent(
     FilterBy(
@@ -140,6 +139,8 @@ ContentClient.getInstance().filterContent(
     )
 )
 ```
+
+The model also allows for an optional `sortBy` which allows for sorting by `ASC` or `DESC` and an optional `page` key, a `Page` class instance. The `Page` class allows for both `size` and `cursor` to be specified for pagination control.
 
 ```kotlin
 ContentClient.getInstance().filterContent(
@@ -156,7 +157,7 @@ ContentClient.getInstance().filterContent(
 
 #### By IDs
 
-Fetch multiple by delivery id e.g.,
+Fetch multiple items by their delivery IDs e.g.,
 
 ```kotlin
 ContentClient.getInstance().listContentById(
@@ -167,6 +168,8 @@ ContentClient.getInstance().listContentById(
 
 #### By keys
 
+Fetching multiple items by their keys:
+
 ```kotlin
 ContentClient.getInstance().listContentByKey(
     "blog/article-1", 
@@ -174,7 +177,9 @@ ContentClient.getInstance().listContentByKey(
 )
 ```
 
-## Getting content (callback examples)
+## Getting content using callbacks
+
+Here is an example of the callback strategy for retrieving content by key:
 
 ```kotlin
 ContentClient.getInstance().getContentByKey("new-banner-format", object : ContentCallback<ListContentResponse?> {
@@ -188,6 +193,8 @@ ContentClient.getInstance().getContentByKey("new-banner-format", object : Conten
 })
 ```
 
+and by ID: 
+
 ```kotlin
 ContentClient.getInstance().getContentById("bd89c2ed-0ed5-4304-8c89-c0710af500e2", object : ContentCallback<ListContentResponse?> {
     override fun onSuccess(result: ListContentResponse?) {
@@ -199,6 +206,8 @@ ContentClient.getInstance().getContentById("bd89c2ed-0ed5-4304-8c89-c0710af500e2
     }
 })
 ```
+
+or using filters:
 
 ```kotlin
 ContentClient.getInstance().filterContent(
@@ -218,6 +227,8 @@ ContentClient.getInstance().filterContent(
 )
 ```
 
+for multiple items:
+
 ```kotlin
 ContentClient.getInstance().filterContent(
     FilterBy(
@@ -239,6 +250,8 @@ ContentClient.getInstance().filterContent(
     }
 )
 ```
+
+and with parameters:
 
 ```kotlin
 ContentClient.getInstance().filterContent(
@@ -261,7 +274,8 @@ ContentClient.getInstance().filterContent(
 
 ##### Java
 
-To filter content in Java you must pass an array of FilterBy, even if you just have one
+To filter content in Java, pass an array of FilterBy objects:
+
 ```java
 ContentClient.getInstance().filterContent(
     new FilterBy[]{
@@ -285,9 +299,10 @@ ContentClient.getInstance().filterContent(
 
 ## Handling the response
 
-[Example json response](https://ampproduct-doc.cdn.content.amplience.net/content/key/new-banner-format?depth=all&format=inlined)
+Here is an [example of a json response](https://ampproduct-doc.cdn.content.amplience.net/content/key/new-banner-format?depth=all&format=inlined).
 
-Create a custom data class (or POJO) formatted the same as your content is returned
+Create a custom data class (or POJO) that is structured in the same way as your content is returned:
+
 ```kotlin
 data class Banner(
     val background: Image,
@@ -311,20 +326,20 @@ data class Link(
 )
 ```
 
-Finally use utility method `parseToObject<*>()`
+Finally use the utility method `parseToObject<*>()`:
+
 ```kotlin
 val result: ListContentResponse? = contentRes.getOrNull() // Your response from earlier
 val banner: Banner? = result?.content?.parseToObject<Banner>()
 ```
 
-Or in java use `parseToObject(Map<String, ?> map, Class<T> classOfT)`
+Or in Java, use `parseToObject(Map<String, ?> map, Class<T> classOfT)`
+
 ```java
 Banner banner = ParseUtils.parseToObject(result.getContent(), Banner.class);
 ```
 
 If your data is returned in a list format you can use `parseToObjectList<*>()` instead:
-
-[Example list response](https://ampproduct-doc.cdn.content.amplience.net/content/id/bd89c2ed-0ed5-4304-8c89-c0710af500e2?depth=all&format=inlined)
 
 Kotlin data class
 ```kotlin
@@ -335,20 +350,24 @@ data class Slide(
 )
 ```
 
+See the [example list response](https://ampproduct-doc.cdn.content.amplience.net/content/id/bd89c2ed-0ed5-4304-8c89-c0710af500e2?depth=all&format=inlined) for the corresponding JSON.
+
 To parse the list data:
+
 ```kotlin
 val result = contentRes.getOrNull()
 val slides: List<Slide>? = result?.content?.parseToObjectList<Slide>("slides")
 ```
 
-Or in java:
+Or in Java:
+
 ```java
 List<Slide> slides = ParseUtils.parseToObjectList(result.getContent(), Slide.class);
 ```
 
 ## Images
 
-To use the Amplience image methods, create your custom Image data class as a subclass of AmplienceImage
+To use Dynamic Media, create your custom Image data class as a subclass of `AmplienceImage`:
 
 ```kotlin
 data class Image(
@@ -361,15 +380,13 @@ data class Image(
 
 Do not use `AmplienceImage` directly because it is an abstract class and will cause errors.
 
-Get the image url:
-
 To get the default image url simply call
 
 ```kotlin
 val url = image.getUrl()
 ```
 
-The url can be customised with the `ImageUrlBuilder` class, for example to set a custom width and height to be returned
+The url can be customised with the `ImageUrlBuilder` class, for example to set a custom width and height to be returned:
 
 ```kotlin
 val url = image.getUrl {
@@ -379,6 +396,7 @@ val url = image.getUrl {
 ```
 
 Or in Java:
+
 ```java
 String url = image.getUrl(
     (builder) -> {
@@ -391,7 +409,7 @@ String url = image.getUrl(
 
 ## Videos
 
-In the same way as images, define your custom Video class as a subclass of `AmplienceVideo`
+In the same way as images, define your custom `Video` class as a subclass of `AmplienceVideo`
 
 ```kotlin
 data class Video(
@@ -410,7 +428,7 @@ Get the video url:
 val url = video.getUrl()
 ```
 
-Optionally add a video profile (defaults to mp4_720p)
+Optionally add a video profile (defaults to `mp4_720p`)
 
 ```kotlin
 val url = video.getUrl(videoProfile = "custom_profile")
@@ -424,7 +442,7 @@ val url = video.getThumbnailUrl()
 
 This can be customised the same way as standard images with the `ImageUrlBuilder`.
 
-You can optionally add a thumb name as defined on the backend system
+You can optionally add a `thumbname` as defined on the backend system
 
 ```kotlin
 val url = video.getThumbnailUrl(thumbname = "frame_0020.png")

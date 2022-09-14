@@ -23,8 +23,7 @@ class ContentClient private constructor(
 ) {
 
     data class Configuration @JvmOverloads constructor(
-        val freshApiKey: String? = null,
-        val otherVar: String? = null
+        val freshApiKey: String? = null
     )
 
     companion object {

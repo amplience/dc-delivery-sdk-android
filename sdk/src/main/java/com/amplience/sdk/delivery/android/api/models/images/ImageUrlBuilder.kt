@@ -41,7 +41,6 @@ class ImageUrlBuilder {
     private var hue: Int? = null
     private var saturation: Int? = null
     private var brightness: Int? = null
-    private var layers: ArrayList<Layer> = ArrayList()
 
     /**
      * [ImageUrlBuilder.width]
@@ -454,96 +453,6 @@ class ImageUrlBuilder {
         this.brightness = brightness
     }
 
-    /**
-     * [ImageUrlBuilder.addImageLayer]
-     * Add an image layer on top of your image
-     *
-     * @param src - The URL for the image in the specified layer. If you start the image URL with "/i//" then it will use the same partial domain as layer0 or the template you specified at the start of the URL
-     * @param width - width in pixels
-     * @param height - height in pixels
-     * @param topPx - pixel offset from the top of your base image. Use [topPx] OR [topPercent]
-     * @param topPercent - percentage offset from the top of your base image (0 - 100). Use [topPx] OR [topPercent]
-     * @param leftPx - pixel offset from the left. Use [leftPx] OR [leftPercent]
-     * @param leftPercent - percentage offset from the left 0 - 100. Use [leftPx] OR [leftPercent]
-     * @param bottomPx - pixel offset from the bottom. Use [bottomPx] OR [bottomPercent]
-     * @param bottomPercent - percentage offset from the bottom 0 - 100. Use [bottomPx] OR [bottomPercent]
-     * @param rightPx - pixel offset from the right. Use [rightPx] OR [rightPercent]
-     * @param rightPercent - percentage offset from the right 0 - 100. Use [rightPx] OR [rightPercent]
-     */
-    fun addImageLayer(
-        src: String,
-        width: Int? = null,
-        height: Int? = null,
-        topPx: Int? = null,
-        topPercent: Int? = null,
-        leftPx: Int? = null,
-        leftPercent: Int? = null,
-        bottomPx: Int? = null,
-        bottomPercent: Int? = null,
-        rightPx: Int? = null,
-        rightPercent: Int? = null,
-        anchor: Anchor? = null,
-        opacity: Int? = null
-    ) {
-        layers.add(
-            ImageLayer(
-                src,
-                width,
-                height,
-                topPx,
-                topPercent,
-                leftPx,
-                leftPercent,
-                bottomPx,
-                bottomPercent,
-                rightPx,
-                rightPercent,
-                anchor,
-                opacity
-            )
-        )
-    }
-
-    /**
-     * [ImageUrlBuilder.addTextLayer]
-     * Add a text layer on top of your image
-     *
-     * @param text - The text to show in the layer. You can add a new line character by including by including \n in the string
-     * @param fontSize - The font size to use for the text. If no font size is specified it will default to 10
-     * @param fontFamily - The font family to use for the text. If you don't specify a font family, or specify a font that is not installed on your account, then it will default to Helevetica
-     * @param fontStyle - Which style of font to use: [TextLayer.FontStyle.Normal], [TextLayer.FontStyle.Italic] or [TextLayer.FontStyle.Oblique]. Font style selection follows CSS rules
-     * @param fontWeight - Sets the thickness of the text. Valid values are from 100 to 900 in multiples of 100
-     * @param fontStretch - Makes text wider or narrower if the font family has appropriate variants. Font selection will follow the CSS rules. See [TextLayer.FontStretch] for options
-     * @param textColor - The color of the text. If no color is specified the text will be black. Values can be [TextLayer.TextColor.Hex], [TextLayer.TextColor.RGB] or [TextLayer.TextColor.ColorName]
-     * @param textDecoration - The decoration added to the text. Supported values are [TextLayer.Decoration.Underline], [TextLayer.Decoration.Overline], [TextLayer.Decoration.LineThrough]
-     * @param textAlign - How the text is aligned within its layer. If no alignment is specified the text will be default to left aligned. Alignment will be used when text is divided over more than one line by using the newline "\n" character.
-     */
-    fun addTextLayer(
-        text: String,
-        fontSize: Int? = null,
-        fontFamily: String? = null,
-        fontStyle: TextLayer.FontStyle? = null,
-        fontWeight: Int? = null, // Valid values are from 100 to 900 in multiples of 100.
-        fontStretch: TextLayer.FontStretch? = null,
-        textColor: TextLayer.TextColor? = null,
-        textDecoration: TextLayer.Decoration? = null,
-        textAlign: String? = null
-    ) {
-        layers.add(
-            TextLayer(
-                text,
-                fontSize,
-                fontFamily,
-                fontStyle,
-                fontWeight,
-                fontStretch,
-                textColor,
-                textDecoration,
-                textAlign
-            )
-        )
-    }
-
     internal fun build(): String {
         val builder = StringBuilder()
         var firstQuery = true
@@ -680,10 +589,6 @@ class ImageUrlBuilder {
         if (hue != null) addQuery("hue", hue!!)
         if (saturation != null) addQuery("sat", saturation!!)
         if (brightness != null) addQuery("bri", brightness!!)
-
-        layers.forEachIndexed { index, layer ->
-            addQuery("layer${index + 1}", layer.toQuery(), preEncoded = true)
-        }
 
         return builder.toString()
     }

@@ -732,14 +732,4 @@ class ImageUrlUnitTest {
             }
         )
     }
-
-    @Test
-    fun `create image url with text layer`() {
-        assertEquals(
-            "https://cdn.media.amplience.net/i/ampproduct/test-image?layer1=[text=Hello]",
-            testImage.getUrl {
-                addTextLayer(text = "Hello")
-            }
-        )
-    }
 }

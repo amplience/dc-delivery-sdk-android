@@ -42,12 +42,7 @@ class MainActivity : ComponentActivity() {
 
         val extras = intent.extras
         val stagingEnvironmentUrl = extras?.getString("stagingEnvironment")
-        if (stagingEnvironmentUrl != null) {
-            // Use stagingEnvironmentUrl instead of production api
-            ContentClient.initialise(applicationContext, stagingEnvironmentUrl)
-        } else {
-            ContentClient.initialise(applicationContext, "ampproduct-doc")
-        }
+        ContentClient.initialise(applicationContext, "ampproduct-doc", ContentClient.Configuration(stagingEnvironmentUrl = stagingEnvironmentUrl))
 
         setContent {
             SampleAppTheme {

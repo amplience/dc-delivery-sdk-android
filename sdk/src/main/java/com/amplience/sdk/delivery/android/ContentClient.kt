@@ -23,7 +23,8 @@ class ContentClient private constructor(
 ) {
 
     data class Configuration @JvmOverloads constructor(
-        val freshApiKey: String? = null
+        val freshApiKey: String? = null,
+        val stagingEnvironmentUrl: String? = null
     )
 
     companion object {
@@ -77,12 +78,18 @@ class ContentClient private constructor(
         }
     }
 
+    private val cacheBaseUrl =
+        if (configuration.stagingEnvironmentUrl != null) "https://${configuration.stagingEnvironmentUrl}/" else "https://$hub.cdn.content.amplience.net/"
+
+    private val freshBaseUrl =
+        if (configuration.stagingEnvironmentUrl != null) "https://${configuration.stagingEnvironmentUrl}/" else "https://$hub.fresh.content.amplience.net/"
+
     private val cacheApi = RetrofitClient
-        .getClient(context, "https://$hub.cdn.content.amplience.net/")
+        .getClient(context, cacheBaseUrl)
         .create(Api::class.java)
 
     private val freshApi = RetrofitClient
-        .getClient(context, "https://$hub.fresh.content.amplience.net/", configuration.freshApiKey)
+        .getClient(context, freshBaseUrl, configuration.freshApiKey)
         .create(Api::class.java)
 
     private val api

@@ -27,7 +27,11 @@ fun Banner(banner: Banner, modifier: Modifier = Modifier) {
     val uriHandler = LocalUriHandler.current
 
     Box(modifier) {
-        ImageUI(image = banner.background, banner.background.alt, Modifier.fillMaxWidth())
+        ImageUI(
+            image = banner.background.image,
+            banner.background.image.alt,
+            Modifier.fillMaxWidth()
+        )
 
         Box(
             Modifier
@@ -74,7 +78,7 @@ private fun CallToAction(
 @Composable
 fun BannerPreview() {
     val banner = Banner(
-        background = Image("", "", "", "", ""),
+        background = Banner.BackgroundImage(image = Image("", "", "", "", "")),
         headline = "Get the look",
         strapline = "A chance to update your wardrobe",
         link = Link("Buy now", "https://google.com")

@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.amplience.sampleapp.app.SampleApplication.Companion.docsPortalContentClient
 import com.amplience.sdk.delivery.android.ContentClient
 import com.amplience.sdk.delivery.android.api.models.FilterBy
 import com.amplience.sdk.delivery.android.api.models.SortBy
@@ -34,8 +35,8 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch {
             val exampleScreens = arrayListOf<Screen>(Screen.HomeScreen())
 
-            val bannerRes = ContentClient.getInstance().getContentByKey("new-banner-format")
-            if (bannerRes.isSuccess) {
+            val bannerRes = docsPortalContentClient?.getContentByKey("banner-example")
+            if (bannerRes != null && bannerRes.isSuccess) {
                 val map = bannerRes.getOrNull() ?: return@launch
                 Timber.d("Map $map")
                 val banner = map.content?.parseToObject<Banner>()
@@ -45,7 +46,7 @@ class MainViewModel : ViewModel() {
                     exampleScreens.add(Screen.BannerScreen(banner))
                 }
             } else {
-                Timber.e(bannerRes.exceptionOrNull())
+                Timber.e(bannerRes?.exceptionOrNull())
             }
 
             val slidesRes = ContentClient.getInstance()
@@ -59,7 +60,7 @@ class MainViewModel : ViewModel() {
                     exampleScreens.add(Screen.SlidesScreen(slides))
                 }
             } else {
-                Timber.e(bannerRes.exceptionOrNull())
+                Timber.e(slidesRes.exceptionOrNull())
             }
 
             val exampleContentRes =

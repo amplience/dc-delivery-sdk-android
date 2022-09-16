@@ -11,8 +11,14 @@ This SDK is designed to help build client side and server side content managed a
 Gradle:
 
 ```gradle
+allprojects {
+    repositories {
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+    }
+}
 dependencies {
-    implementation '......'
+    implementation 'com.github.amplience:dc-delivery-sdk-android:1.0'
 }
 ```
 
@@ -62,7 +68,7 @@ Add customisation in initialisation with the `ContentClient.Configuration` class
 
 ```kotlin
 ContentClient.initialise(
-    context = applicationContext, 
+    context = applicationContext,
     hub = "your-hub-name",
     configuration = ContentClient.Configuration(
         freshApiKey = "..."
@@ -172,7 +178,7 @@ Fetching multiple items by their keys:
 
 ```kotlin
 ContentClient.getInstance().listContentByKey(
-    "blog/article-1", 
+    "blog/article-1",
     "blog/article-2"
 )
 ```
@@ -193,7 +199,7 @@ ContentClient.getInstance().getContentByKey("new-banner-format", object : Conten
 })
 ```
 
-and by ID: 
+and by ID:
 
 ```kotlin
 ContentClient.getInstance().getContentById("bd89c2ed-0ed5-4304-8c89-c0710af500e2", object : ContentCallback<ListContentResponse?> {
@@ -422,7 +428,7 @@ data class Video(
 
 Do not use `AmplienceVideo` directly because it is an abstract class and will cause errors.
 
-Get the video url: 
+Get the video url:
 
 ```kotlin
 val url = video.getUrl()
@@ -452,7 +458,7 @@ val url = video.getThumbnailUrl(thumbname = "frame_0020.png")
 
 Use a fresh api to get non-cached data (for development only - see https://amplience.com/docs/development/freshapi/fresh-api.html for details)
 
-Ensure you have set a `freshApiKey` in the `ContentClient.Configuration` class in either `initialise` or `newInstance`. Failing to set a fresh api key will throw a RuntimeException when trying to set fresh to true. 
+Ensure you have set a `freshApiKey` in the `ContentClient.Configuration` class in either `initialise` or `newInstance`. Failing to set a fresh api key will throw a RuntimeException when trying to set fresh to true.
 
 ```kotlin
 ContentClient.getInstance().isFresh = true

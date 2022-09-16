@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
 
         val extras = intent.extras
         val stagingEnvironmentUrl = extras?.getString("stagingEnvironment")
-        ContentClient.initialise(applicationContext, "ampproduct-doc", ContentClient.Configuration(freshApiKey = null, stagingEnvironmentUrl = stagingEnvironmentUrl))
+        ContentClient.initialise(applicationContext, "ampproduct-doc", ContentClient.Configuration(stagingEnvironmentUrl = stagingEnvironmentUrl))
 
         setContent {
             SampleAppTheme {

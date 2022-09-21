@@ -1,11 +1,12 @@
 package com.amplience.sampleapp
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.amplience.sampleapp.app.SampleApplication.Companion.docsPortalContentClient
 import com.amplience.sdk.delivery.android.ContentClient
 import com.amplience.sdk.delivery.android.api.models.FilterBy
 import com.amplience.sdk.delivery.android.api.models.SortBy
@@ -26,27 +27,47 @@ class MainViewModel : ViewModel() {
     var appBarTitle by mutableStateOf("")
     var screens by mutableStateOf<List<Screen>>(listOf())
     var lowBandwidth: Boolean = false
+    var applicationContext: Context? = null
+    var stagingEnvironmentUrl: String? = null
 
     init {
         getExamples()
     }
 
-    private fun getExamples() {
+    fun getExamples() {
         viewModelScope.launch {
+            Timber.d("getExamples()")
             val exampleScreens = arrayListOf<Screen>(Screen.HomeScreen())
 
-            val bannerRes = docsPortalContentClient?.getContentByKey("banner-example")
-            if (bannerRes != null && bannerRes.isSuccess) {
-                val map = bannerRes.getOrNull() ?: return@launch
-                Timber.d("Map $map")
-                val banner = map.content?.parseToObject<Banner>()
-                Timber.d("Banner $banner")
+            if (applicationContext != null) {
+                Timber.d("getExamples(): applicationContext != null")
 
-                if (banner != null) {
-                    exampleScreens.add(Screen.BannerScreen(banner))
+                val docsPortalContentClient = ContentClient.newInstance(applicationContext!!, "docsportal", configuration = ContentClient.Configuration(stagingEnvironmentUrl = stagingEnvironmentUrl))
+                Timber.d("docsPortalContentClient = ")
+                Timber.d(docsPortalContentClient.toString())
+                val bannerRes = docsPortalContentClient.getContentByKey("banner-example")
+                if (bannerRes.isSuccess) {
+                    val map = bannerRes.getOrNull() ?: return@launch
+                    Timber.d("Map $map")
+                    val banner = map.content?.parseToObject<Banner>()
+                    Timber.d("Banner $banner")
+
+                    if (banner != null) {
+                        Timber.d("getExamples(): banner != null")
+
+                        exampleScreens.add(Screen.BannerScreen(banner))
+                    } else {
+                        Timber.d("getExamples(): banner == null")
+
+                    }
+                } else {
+                    Timber.d("getExamples(): bannerRes?.exceptionOrNull()")
+                    Timber.e(bannerRes?.exceptionOrNull())
                 }
+
             } else {
-                Timber.e(bannerRes?.exceptionOrNull())
+                Timber.d("getExamples(): applicationContext == null")
+
             }
 
             val slidesRes = ContentClient.getInstance()

@@ -5,16 +5,15 @@ import android.util.Log
 import com.amplience.sdk.delivery.android.api.Api
 import com.amplience.sdk.delivery.android.api.ContentCallback
 import com.amplience.sdk.delivery.android.api.RetrofitClient
-import com.amplience.sdk.delivery.android.api.models.FilterBy
-import com.amplience.sdk.delivery.android.api.models.FilterContentRequest
-import com.amplience.sdk.delivery.android.api.models.FilterContentResponse
-import com.amplience.sdk.delivery.android.api.models.ListContentRequest
-import com.amplience.sdk.delivery.android.api.models.ListContentResponse
-import com.amplience.sdk.delivery.android.api.models.Request
-import com.amplience.sdk.delivery.android.api.models.SortBy
+import com.amplience.sdk.delivery.android.api.models.*
+import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
+
 
 class ContentClient private constructor(
     context: Context,
@@ -55,8 +54,10 @@ class ContentClient private constructor(
             context: Context,
             hub: String,
             configuration: Configuration = Configuration()
-        ): ContentClient =
-            ContentClient(context, hub, configuration)
+        ): ContentClient {
+            Log.d("newInstance", "newInstance; hub = $hub")
+            return ContentClient(context, hub, configuration)
+        }
 
         /**
          * [initialise]
@@ -84,13 +85,21 @@ class ContentClient private constructor(
     private val freshBaseUrl =
         if (configuration.stagingEnvironmentUrl != null) "https://${configuration.stagingEnvironmentUrl}/" else "https://$hub.fresh.content.amplience.net/"
 
-    private val cacheApi = RetrofitClient
-        .getClient(context, cacheBaseUrl)
-        .create(Api::class.java)
+    private val cacheApi
+        get() = getClient(cacheBaseUrl)
 
-    private val freshApi = RetrofitClient
-        .getClient(context, freshBaseUrl, configuration.freshApiKey)
-        .create(Api::class.java)
+    private val freshApi
+        get() = getClient(freshBaseUrl)
+
+    fun getClient(baseUrl: String): Api {
+        val httpClientBuilder: OkHttpClient.Builder = OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+        return Retrofit.Builder().client(httpClientBuilder.build())
+            .baseUrl(baseUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build().create(Api::class.java)
+    }
 
     private val api
         get() = if (isFresh) freshApi else cacheApi
@@ -166,6 +175,7 @@ class ContentClient private constructor(
      * Can get error response with result.getExceptionOrNull()
      */
     suspend fun getContentByKey(key: String): Result<ListContentResponse?> {
+        Log.d("getContentByKey", api.toString())
         val res = try {
             api.getContentByKey(key)
         } catch (e: Exception) {

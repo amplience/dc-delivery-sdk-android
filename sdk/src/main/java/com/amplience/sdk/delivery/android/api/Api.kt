@@ -11,7 +11,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 
-internal interface Api {
+interface Api {
 
     @GET("content/id/{id}?depth=all&format=inlined")
     suspend fun getContentById(@Path("id") id: String): Response<ListContentResponse>

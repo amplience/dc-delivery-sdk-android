@@ -8,7 +8,6 @@ import timber.log.Timber
 class SampleApplication : Application() {
 
     companion object {
-        var docsPortalContentClient: ContentClient? = null
     }
 
     override fun onCreate() {
@@ -17,7 +16,5 @@ class SampleApplication : Application() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
-
-        docsPortalContentClient = ContentClient.newInstance(applicationContext, "docsportal")
     }
 }

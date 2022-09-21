@@ -1,5 +1,6 @@
 package com.amplience.sampleapp
 
+import android.content.Context
 import android.net.ConnectivityManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -56,6 +57,9 @@ class MainActivity : ComponentActivity() {
         }
 
         checkNetworkSpeed()
+        viewModel.applicationContext = applicationContext
+        viewModel.stagingEnvironmentUrl = stagingEnvironmentUrl
+        viewModel.getExamples()
     }
 
     private fun checkNetworkSpeed() {

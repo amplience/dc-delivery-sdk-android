@@ -36,7 +36,6 @@ class MainViewModel : ViewModel() {
 
     fun getExamples() {
         viewModelScope.launch {
-            Timber.d("getExamples()")
             val exampleScreens = arrayListOf<Screen>(Screen.HomeScreen())
 
             if (applicationContext != null) {

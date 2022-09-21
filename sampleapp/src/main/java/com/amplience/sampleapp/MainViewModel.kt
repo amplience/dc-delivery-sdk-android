@@ -40,34 +40,22 @@ class MainViewModel : ViewModel() {
             val exampleScreens = arrayListOf<Screen>(Screen.HomeScreen())
 
             if (applicationContext != null) {
-                Timber.d("getExamples(): applicationContext != null")
-
-                val docsPortalContentClient = ContentClient.newInstance(applicationContext!!, "docsportal", configuration = ContentClient.Configuration(stagingEnvironmentUrl = stagingEnvironmentUrl))
-                Timber.d("docsPortalContentClient = ")
-                Timber.d(docsPortalContentClient.toString())
+                val docsPortalContentClient = ContentClient.newInstance(
+                    applicationContext!!,
+                    "docsportal",
+                    configuration = ContentClient.Configuration(stagingEnvironmentUrl = stagingEnvironmentUrl)
+                )
                 val bannerRes = docsPortalContentClient.getContentByKey("banner-example")
                 if (bannerRes.isSuccess) {
                     val map = bannerRes.getOrNull() ?: return@launch
-                    Timber.d("Map $map")
                     val banner = map.content?.parseToObject<Banner>()
-                    Timber.d("Banner $banner")
 
                     if (banner != null) {
-                        Timber.d("getExamples(): banner != null")
-
                         exampleScreens.add(Screen.BannerScreen(banner))
-                    } else {
-                        Timber.d("getExamples(): banner == null")
-
                     }
                 } else {
-                    Timber.d("getExamples(): bannerRes?.exceptionOrNull()")
                     Timber.e(bannerRes?.exceptionOrNull())
                 }
-
-            } else {
-                Timber.d("getExamples(): applicationContext == null")
-
             }
 
             val slidesRes = ContentClient.getInstance()
@@ -116,7 +104,8 @@ class MainViewModel : ViewModel() {
             if (filterableRes.isSuccess) {
                 val results = filterableRes.getOrNull()
                 Timber.d("Filterable map $results")
-                val blogList = results?.responses?.mapNotNull { it.content?.parseToObject<BlogPost>() }
+                val blogList =
+                    results?.responses?.mapNotNull { it.content?.parseToObject<BlogPost>() }
                 Timber.d("Blog list $blogList")
 
                 if (blogList != null) {
@@ -140,7 +129,8 @@ class MainViewModel : ViewModel() {
                 )
             if (filterableByReadTimeRes.isSuccess) {
                 val results = filterableByReadTimeRes.getOrNull()
-                val blogList = results?.responses?.mapNotNull { it.content?.parseToObject<BlogPost>() }
+                val blogList =
+                    results?.responses?.mapNotNull { it.content?.parseToObject<BlogPost>() }
 
                 if (blogList != null) {
                     exampleScreens.add(
@@ -168,7 +158,8 @@ class MainViewModel : ViewModel() {
                 )
             if (filterableByHomewareRes.isSuccess) {
                 val results = filterableByHomewareRes.getOrNull()
-                val blogList = results?.responses?.mapNotNull { it.content?.parseToObject<BlogPost>() }
+                val blogList =
+                    results?.responses?.mapNotNull { it.content?.parseToObject<BlogPost>() }
 
                 if (blogList != null) {
                     exampleScreens.add(

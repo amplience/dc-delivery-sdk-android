@@ -6,13 +6,9 @@ import com.amplience.sdk.delivery.android.api.Api
 import com.amplience.sdk.delivery.android.api.ContentCallback
 import com.amplience.sdk.delivery.android.api.RetrofitClient
 import com.amplience.sdk.delivery.android.api.models.*
-import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import java.util.concurrent.TimeUnit
 
 
 class ContentClient private constructor(
@@ -86,20 +82,14 @@ class ContentClient private constructor(
         if (configuration.stagingEnvironmentUrl != null) "https://${configuration.stagingEnvironmentUrl}/" else "https://$hub.fresh.content.amplience.net/"
 
     private val cacheApi
-        get() = getClient(cacheBaseUrl)
+        get() = RetrofitClient
+            .getClient(cacheBaseUrl)
+            .create(Api::class.java)
 
     private val freshApi
-        get() = getClient(freshBaseUrl)
-
-    fun getClient(baseUrl: String): Api {
-        val httpClientBuilder: OkHttpClient.Builder = OkHttpClient.Builder()
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(10, TimeUnit.SECONDS)
-        return Retrofit.Builder().client(httpClientBuilder.build())
-            .baseUrl(baseUrl)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build().create(Api::class.java)
-    }
+        get() = RetrofitClient
+            .getClient(freshBaseUrl, configuration.freshApiKey)
+            .create(Api::class.java)
 
     private val api
         get() = if (isFresh) freshApi else cacheApi

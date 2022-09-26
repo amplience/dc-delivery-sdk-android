@@ -1,6 +1,5 @@
 package com.amplience.sdk.delivery.android.api
 
-import android.content.Context
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -10,10 +9,20 @@ import java.util.concurrent.TimeUnit
 
 internal object RetrofitClient {
 
-    private var retrofit: Retrofit? = null
+    // Store retrofit instances by their base url, separated by cache or fresh
+    private var cacheClients: HashMap<String, Retrofit?> = hashMapOf()
+    private var freshClients: HashMap<String, Retrofit?> = hashMapOf()
 
-    fun getClient(context: Context, baseUrl: String, freshApiKey: String? = null): Retrofit {
-        if (retrofit == null) {
+    fun getClient(baseUrl: String, freshApiKey: String? = null): Retrofit {
+        // Find existing client in relevant map depending on whether fresh api key is present
+        val existing = if (freshApiKey == null) {
+            cacheClients[baseUrl]
+        } else {
+            freshClients[baseUrl]
+        }
+        if (existing != null) {
+            return existing
+        } else {
             val interceptor = HttpLoggingInterceptor()
             interceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS)
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
@@ -36,13 +45,20 @@ internal object RetrofitClient {
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
                 .create()
 
-            retrofit = Retrofit.Builder()
+            val new = Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(client.build())
                 .build()
-        }
 
-        return retrofit!!
+            // Store new client in relevant map
+            if (freshApiKey == null) {
+                cacheClients[baseUrl] = new
+            } else {
+                freshClients[baseUrl] = new
+            }
+
+            return new
+        }
     }
 }
